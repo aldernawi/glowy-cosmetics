@@ -7,11 +7,13 @@ use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\CartController;
+use App\Http\Controllers\Storefront\CartItemController;
 use App\Http\Controllers\Storefront\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/cart', CartController::class)->name('cart.index');
+Route::post('/cart/items', [CartItemController::class, 'store'])->name('cart.items.store');
 
 Route::get('/dashboard', CustomerDashboardController::class)
     ->middleware(['auth', 'verified'])

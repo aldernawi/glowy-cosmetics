@@ -26,7 +26,7 @@
                 </nav>
                 <div class="flex items-center gap-2">
                     <a href="{{ route('login') }}" class="rounded-full px-3 py-2 text-sm font-medium transition hover:bg-glowy-blush">دخول</a>
-                    <a href="#" class="rounded-full bg-glowy-rose px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-glowy-plum">السلة</a>
+                    <a href="{{ route('cart.index') }}" class="rounded-full bg-glowy-rose px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-glowy-plum">السلة</a>
                 </div>
             </div>
         </header>
