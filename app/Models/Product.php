@@ -31,6 +31,11 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class)->orderBy('sort_order');
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+    }
+
     public function skinTypes(): BelongsToMany
     {
         return $this->belongsToMany(SkinType::class);

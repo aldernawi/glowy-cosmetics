@@ -28,5 +28,9 @@ class ProductVariantTest extends TestCase
         $this->assertSame('95.000', $variant->price);
         $this->assertSame(0, $variant->stock_quantity);
         $this->assertTrue($product->variants->contains($variant));
+
+        $image = $product->images()->create(['path' => 'products/cleanser.webp', 'is_primary' => true]);
+
+        $this->assertTrue($image->is_primary);
     }
 }
