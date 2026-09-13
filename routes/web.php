@@ -9,11 +9,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CartItemController;
 use App\Http\Controllers\Storefront\HomeController;
+use App\Http\Controllers\Storefront\ProductController as StorefrontProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/cart', CartController::class)->name('cart.index');
 Route::post('/cart/items', [CartItemController::class, 'store'])->name('cart.items.store');
+Route::get('/products', [StorefrontProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product}', [StorefrontProductController::class, 'show'])->name('products.show');
 
 Route::get('/dashboard', CustomerDashboardController::class)
     ->middleware(['auth', 'verified'])

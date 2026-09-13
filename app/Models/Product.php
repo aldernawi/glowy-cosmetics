@@ -16,6 +16,11 @@ class Product extends Model
         return ['is_active' => 'boolean', 'is_featured' => 'boolean', 'is_new' => 'boolean'];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
