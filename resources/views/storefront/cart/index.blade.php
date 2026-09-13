@@ -7,6 +7,7 @@
             <x-ui.empty-state title="سلتك فارغة الآن" description="ابدئي باكتشاف منتجات العناية التي تناسب روتينك." />
         @else
             <p class="mt-5 text-glowy-muted">لديك {{ $cart->items->sum('quantity') }} منتجات في السلة.</p>
+            <a href="{{ route('checkout.index') }}" class="mt-6 inline-flex min-h-11 items-center rounded-full bg-glowy-rose px-5 py-2.5 font-bold text-white">إتمام الطلب</a>
         @endif
     </section>
 </x-layouts.storefront>
