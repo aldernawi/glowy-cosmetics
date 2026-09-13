@@ -30,6 +30,9 @@ class CheckoutService
                 throw new DomainException('Delivery configuration changed. Request a new quote.');
             }
             $this->tiers->validateActiveTiers();
+            if ($this->tiers->tierForDistance($quote->distanceKm)->id !== $tier->id) {
+                throw new DomainException('Delivery tier no longer matches the quoted distance.');
+            }
             $lockedCart = Cart::query()->lockForUpdate()->findOrFail($cart->id);
             $items = $lockedCart->items()->lockForUpdate()->get();
             if ($items->isEmpty()) {

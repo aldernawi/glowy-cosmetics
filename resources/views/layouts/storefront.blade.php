@@ -16,7 +16,7 @@
 
         <header class="border-b border-glowy-champagne/70 bg-glowy-ivory/95">
             <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
-                <a href="{{ route('home') }}" class="text-2xl font-bold tracking-tight text-glowy-plum" aria-label="Glowy الرئيسية">Glowy<span class="text-glowy-rose">✦</span></a>
+                <a href="{{ route('home') }}" class="block" aria-label="Glowy الرئيسية"><img src="{{ Vite::asset('resources/images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-36 sm:w-44"></a>
                 <nav class="hidden items-center gap-6 text-sm font-medium lg:flex" aria-label="التنقل الرئيسي">
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index') }}">العناية بالبشرة</a>
                     <a class="transition hover:text-glowy-rose" href="#">واقي الشمس</a>

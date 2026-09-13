@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Services\OrderService;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,5 +45,12 @@ class OrderStatusTest extends TestCase
             ->assertRedirect(route('admin.orders.index'));
 
         $this->assertSame(OrderStatus::Confirmed, $order->refresh()->status);
+    }
+
+    public function test_an_order_cannot_skip_its_lifecycle(): void
+    {
+        $order = Order::query()->create(['number' => 'GLW-RULE', 'status' => OrderStatus::Pending, 'customer_name' => 'عميلة', 'phone' => '09', 'delivery_latitude' => '1.0000000', 'delivery_longitude' => '1.0000000', 'delivery_distance_km' => '1.000', 'delivery_fee' => '1.000', 'store_latitude_snapshot' => '1.0000000', 'store_longitude_snapshot' => '1.0000000', 'subtotal' => '1.000', 'discount' => '0.000', 'total' => '2.000']);
+        $this->expectException(DomainException::class);
+        app(OrderService::class)->transition($order, OrderStatus::Delivered);
     }
 }
