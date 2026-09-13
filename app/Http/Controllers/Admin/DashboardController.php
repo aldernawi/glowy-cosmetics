@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Response;
+use Illuminate\Contracts\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): Response
+    public function __invoke(): View
     {
-        return response('Admin dashboard foundation');
+        return view('admin.dashboard');
     }
 }

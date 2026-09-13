@@ -3,6 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -21,5 +22,18 @@ class AdminAccessTest extends TestCase
         $this->actingAs(User::factory()->create())
             ->get(route('admin.dashboard'))
             ->assertForbidden();
+    }
+
+    public function test_administrators_can_view_the_dashboard(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+
+        $this->actingAs($administrator)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('لوحة التحكم');
     }
 }

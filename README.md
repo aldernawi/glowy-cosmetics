@@ -1,58 +1,46 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Glowy Cosmetics
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+متجر Laravel عربي RTL للعناية بالبشرة والجمال. التقنية الأساسية: Laravel 13، PHP 8.4، MySQL 8، Blade، Livewire 4، Tailwind 4، وVite.
 
-## About Laravel
+## التشغيل المحلي
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. انسخ `.env.example` إلى `.env` وأنشئ مفتاح التطبيق:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+   ```powershell
+   Copy-Item .env.example .env
+   php artisan key:generate
+   ```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. أنشئ قاعدة MySQL واضبط `DB_CONNECTION=mysql` وبياناتها في `.env`.
 
-## Learning Laravel
+3. لتوليد مدير محلي اختياري، أضف إلى `.env` قيمًا قوية وآمنة:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+   ```dotenv
+   GLOWY_ADMIN_NAME="Glowy Admin"
+   GLOWY_ADMIN_EMAIL=admin@example.test
+   GLOWY_ADMIN_PASSWORD=change-this-to-a-strong-password
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+   اترك البريد وكلمة المرور فارغين إذا لم ترد إنشاء مدير تلقائيًا.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+4. ثبّت الاعتمادات وشغّل الترحيلات والبناء:
 
-## Agentic Development
+   ```powershell
+   composer install
+   npm install
+   php artisan migrate --seed
+   npm run build
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## التحقق
 
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```powershell
+php artisan optimize:clear
+vendor/bin/pint --test
+php artisan test
+php artisan route:cache
+php artisan config:cache
+php artisan view:cache
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+مفاتيح Google Maps وGoogle Routes لا تُضاف إلا عند مرحلة التوصيل، وتبقى في `.env` فقط.
