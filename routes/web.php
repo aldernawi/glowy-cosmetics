@@ -46,6 +46,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::post('stock/adjustments', [StockAdjustmentController::class, 'store'])->name('stock.adjustments.store');
     Route::get('delivery', [DeliverySettingController::class, 'index'])->name('delivery.index');
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::put('delivery/origin', [DeliverySettingController::class, 'updateOrigin'])->name('delivery.origin.update');
     Route::post('delivery/tiers', [DeliverySettingController::class, 'storeTier'])->name('delivery.tiers.store');

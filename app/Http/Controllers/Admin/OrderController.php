@@ -17,6 +17,11 @@ class OrderController extends Controller
         return view('admin.orders.index', ['orders' => Order::query()->latest()->paginate(25)]);
     }
 
+    public function show(Order $order): View
+    {
+        return view('admin.orders.show', ['order' => $order->load('items.productVariant')]);
+    }
+
     public function update(Request $request, Order $order, OrderService $orders): RedirectResponse
     {
         $request->validate(['status' => ['required', 'in:'.implode(',', array_column(OrderStatus::cases(), 'value'))]]);
