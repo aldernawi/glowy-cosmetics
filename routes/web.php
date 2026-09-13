@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\HomeController;
@@ -26,6 +27,8 @@ Route::get('/admin', DashboardController::class)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.access'])->group(function (): void {
     Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
     Route::post('brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('products', [ProductController::class, 'store'])->name('products.store');
 });
 
 require __DIR__.'/auth.php';
