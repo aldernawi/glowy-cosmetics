@@ -16,6 +16,7 @@
                 <nav class="mt-8 grid gap-1 text-sm" aria-label="التنقل الإداري">
                     <a href="{{ route('admin.dashboard') }}" class="rounded-xl bg-white/10 px-4 py-3 font-bold">لوحة التحكم</a>
                     <span class="rounded-xl px-4 py-3 text-white/55">الطلبات — قريبًا</span>
+                    <a href="{{ route('admin.brands.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">الماركات</a>
                     <span class="rounded-xl px-4 py-3 text-white/55">المنتجات — قريبًا</span>
                     <span class="rounded-xl px-4 py-3 text-white/55">المخزون — قريبًا</span>
                     <span class="rounded-xl px-4 py-3 text-white/55">التوصيل — قريبًا</span>
