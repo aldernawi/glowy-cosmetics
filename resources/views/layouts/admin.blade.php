@@ -18,7 +18,7 @@
                     <span class="rounded-xl px-4 py-3 text-white/55">الطلبات — قريبًا</span>
                     <a href="{{ route('admin.brands.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">الماركات</a>
                     <a href="{{ route('admin.products.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المنتجات</a>
-                    <span class="rounded-xl px-4 py-3 text-white/55">المخزون — قريبًا</span>
+                    <a href="{{ route('admin.stock.adjustments.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المخزون</a>
                     <span class="rounded-xl px-4 py-3 text-white/55">التوصيل — قريبًا</span>
                     <span class="rounded-xl px-4 py-3 text-white/55">الإعدادات — قريبًا</span>
                 </nav>
