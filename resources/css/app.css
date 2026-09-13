@@ -4,3 +4,15 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+
+@theme {
+    --color-glowy-rose: #b07366;
+    --color-glowy-plum: #3a2f33;
+    --color-glowy-ivory: #fcfbfa;
+    --color-glowy-blush: #f8eeeb;
+    --color-glowy-champagne: #e8d7ce;
+    --color-glowy-ink: #2e2528;
+    --color-glowy-muted: #786b6e;
+    --font-sans: Tajawal, Arial, sans-serif;
+    --font-display: Alexandria, Tajawal, Arial, sans-serif;
+}
