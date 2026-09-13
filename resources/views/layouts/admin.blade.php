@@ -11,7 +11,7 @@
         <a href="#main-content" class="sr-only z-50 rounded-full bg-glowy-plum px-4 py-3 text-white focus:not-sr-only focus:fixed focus:right-4 focus:top-4">انتقلي إلى المحتوى</a>
         <div class="min-h-screen lg:grid lg:grid-cols-[17rem_1fr]">
             <aside class="bg-glowy-plum px-5 py-6 text-white lg:min-h-screen">
-                <a href="{{ route('admin.dashboard') }}" class="block rounded-2xl bg-white p-3"><img src="{{ Vite::asset('resources/images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-36"></a>
+                <a href="{{ route('admin.dashboard') }}" class="block rounded-2xl bg-white p-3"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-36"></a>
                 <p class="mt-1 text-sm text-white/65">لوحة الإدارة</p>
                 <nav class="mt-8 grid gap-1 text-sm" aria-label="التنقل الإداري">
                     <a href="{{ route('admin.dashboard') }}" class="rounded-xl bg-white/10 px-4 py-3 font-bold">لوحة التحكم</a>
