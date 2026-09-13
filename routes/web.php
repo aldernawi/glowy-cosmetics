@@ -6,10 +6,12 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\HomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/cart', CartController::class)->name('cart.index');
 
 Route::get('/dashboard', CustomerDashboardController::class)
     ->middleware(['auth', 'verified'])
