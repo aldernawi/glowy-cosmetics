@@ -29,10 +29,11 @@ class CheckoutServiceTest extends TestCase
         $tier = DeliveryTier::query()->create(['min_distance_km' => '0.000', 'max_distance_km' => '10.000', 'fee' => '10.000', 'is_active' => true]);
         $quote = new DeliveryQuote('5.000', 600, '10.000', $tier->id, $setting->id);
 
-        $order = app(CheckoutService::class)->create($cart, $user, $quote, ['customer_name' => 'عميلة', 'phone' => '0910000000', 'latitude' => '32.9000000', 'longitude' => '13.2000000']);
+        $order = app(CheckoutService::class)->create($cart, $user, $quote, ['customer_name' => 'عميلة', 'phone' => '0910000000', 'secondary_phone' => '0920000000', 'address' => 'حي الأندلس', 'place_id' => 'place-1', 'notes' => 'بجوار الصيدلية', 'latitude' => '32.9000000', 'longitude' => '13.2000000']);
 
         $this->assertSame('35.000', $order->total);
         $this->assertSame(2, $variant->refresh()->stock_quantity);
         $this->assertDatabaseCount('order_items', 1);
+        $this->assertSame('place-1', $order->delivery_place_id);
     }
 }

@@ -30,7 +30,7 @@ class CheckoutEndpointTest extends TestCase
         Http::fake(['routes.googleapis.com/*' => Http::response(['routes' => [['distanceMeters' => 5000, 'duration' => '600s']]])]);
 
         $this->actingAs($user)->post(route('checkout.store'), ['customer_name' => 'عميلة', 'phone' => '0910000000', 'latitude' => '32.9000000', 'longitude' => '13.2000000', 'total' => '1.000', 'delivery_fee' => '0.000'])
-            ->assertRedirect(route('checkout.index'));
+            ->assertRedirect(route('checkout.success'));
 
         $this->assertDatabaseHas('orders', ['subtotal' => '20.000', 'delivery_fee' => '10.000', 'total' => '30.000']);
     }

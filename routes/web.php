@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CartItemController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\CustomerOrderController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\ProductController as StorefrontProductController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,8 @@ Route::get('/cart', CartController::class)->name('cart.index');
 Route::post('/cart/items', [CartItemController::class, 'store'])->name('cart.items.store');
 Route::get('/checkout', CheckoutController::class)->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/quote', [CheckoutController::class, 'quote'])->name('checkout.quote');
+Route::get('/checkout/success', [CustomerOrderController::class, 'success'])->name('checkout.success');
 Route::get('/products', [StorefrontProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product}', [StorefrontProductController::class, 'show'])->name('products.show');
 
@@ -28,6 +31,8 @@ Route::get('/dashboard', CustomerDashboardController::class)
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/orders', [CustomerOrderController::class, 'index'])->name('customer.orders.index');
+    Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])->name('customer.orders.show');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -47,7 +52,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::get('delivery', [DeliverySettingController::class, 'index'])->name('delivery.index');
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('orders/{order}/print', [OrderController::class, 'print'])->name('orders.print');
     Route::patch('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+    Route::patch('orders/{order}/payment', [OrderController::class, 'updatePayment'])->name('orders.payment.update');
     Route::put('delivery/origin', [DeliverySettingController::class, 'updateOrigin'])->name('delivery.origin.update');
     Route::post('delivery/tiers', [DeliverySettingController::class, 'storeTier'])->name('delivery.tiers.store');
 });

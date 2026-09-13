@@ -32,4 +32,11 @@ class DeliveryTierServiceTest extends TestCase
 
         app(DeliveryTierService::class)->validateActiveTiers();
     }
+
+    public function test_out_of_range_distance_is_rejected(): void
+    {
+        DeliveryTier::query()->create(['min_distance_km' => '0.000', 'max_distance_km' => '10.000', 'fee' => '10.000', 'is_active' => true]);
+        $this->expectException(DomainException::class);
+        app(DeliveryTierService::class)->tierForDistance('10.001');
+    }
 }

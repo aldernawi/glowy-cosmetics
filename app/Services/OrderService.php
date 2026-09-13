@@ -28,7 +28,10 @@ class OrderService
                         app(StockService::class)->adjust($item->productVariant, $item->quantity, $status === OrderStatus::Cancelled ? StockMovementType::Return : StockMovementType::Return, 'order-restock-'.$status->value.'-'.$order->id.'-'.$item->id, $actor, $order->number);
                     }
                 }
-            } $order->update(['status' => $status]);
+            }
+            $previousStatus = $order->status;
+            $order->update(['status' => $status]);
+            $order->statusHistory()->create(['user_id' => $actor?->id, 'from_status' => $previousStatus->value, 'to_status' => $status->value]);
 
             return $order;
         });
