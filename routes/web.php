@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliverySettingController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\CustomerDashboardController;
@@ -44,6 +45,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::get('stock/adjustments', [StockAdjustmentController::class, 'index'])->name('stock.adjustments.index');
     Route::post('stock/adjustments', [StockAdjustmentController::class, 'store'])->name('stock.adjustments.store');
     Route::get('delivery', [DeliverySettingController::class, 'index'])->name('delivery.index');
+    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::patch('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
     Route::put('delivery/origin', [DeliverySettingController::class, 'updateOrigin'])->name('delivery.origin.update');
     Route::post('delivery/tiers', [DeliverySettingController::class, 'storeTier'])->name('delivery.tiers.store');
 });
