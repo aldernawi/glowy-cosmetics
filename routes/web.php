@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliverySettingController;
 use App\Http\Controllers\Admin\OrderController;
@@ -51,6 +52,7 @@ Route::get('/admin', DashboardController::class)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.access'])->group(function (): void {
     Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
     Route::post('brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::patch('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
     Route::get('stock/adjustments', [StockAdjustmentController::class, 'index'])->name('stock.adjustments.index');
