@@ -6,6 +6,84 @@ window.Alpine = Alpine;
 
 Alpine.start();
 
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const revealElements = [...document.querySelectorAll('[data-reveal]')];
+
+document.documentElement.classList.add('motion-ready');
+
+if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    revealElements.forEach((element) => element.classList.add('is-visible'));
+} else {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+        });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+
+    revealElements.forEach((element) => revealObserver.observe(element));
+}
+
+if (!prefersReducedMotion && window.matchMedia('(pointer: fine)').matches) {
+    document.querySelectorAll('[data-parallax-scene]').forEach((scene) => {
+        const layers = [...scene.querySelectorAll('[data-parallax]')];
+        let animationFrame;
+
+        const render = (event) => {
+            const bounds = scene.getBoundingClientRect();
+            const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+            const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+            layers.forEach((layer) => {
+                const depth = Number(layer.dataset.parallaxDepth || 1);
+                layer.style.setProperty('--parallax-x', `${x * 16 * depth}px`);
+                layer.style.setProperty('--parallax-y', `${y * 12 * depth}px`);
+            });
+        };
+
+        scene.addEventListener('pointermove', (event) => {
+            cancelAnimationFrame(animationFrame);
+            animationFrame = requestAnimationFrame(() => render(event));
+        }, { passive: true });
+
+        scene.addEventListener('pointerleave', () => {
+            layers.forEach((layer) => {
+                layer.style.setProperty('--parallax-x', '0px');
+                layer.style.setProperty('--parallax-y', '0px');
+            });
+        });
+    });
+}
+
+document.querySelectorAll('[data-marquee]').forEach((marquee) => {
+    const toggle = marquee.querySelector('[data-marquee-toggle]');
+    if (!toggle) return;
+
+    const setPaused = (paused) => {
+        marquee.classList.toggle('is-paused', paused);
+        toggle.setAttribute('aria-pressed', String(paused));
+        toggle.textContent = paused ? 'تشغيل الحركة' : 'إيقاف الحركة';
+    };
+
+    if (prefersReducedMotion) {
+        setPaused(true);
+        toggle.textContent = 'الحركة متوقفة';
+        toggle.disabled = true;
+    } else {
+        toggle.addEventListener('click', () => setPaused(!marquee.classList.contains('is-paused')));
+    }
+});
+
+const siteHeader = document.querySelector('[data-site-header]');
+if (siteHeader) {
+    const updateHeader = () => siteHeader.classList.toggle('is-scrolled', window.scrollY > 24);
+
+    updateHeader();
+    window.addEventListener('scroll', updateHeader, { passive: true });
+}
+
 const mapElement = document.querySelector('#delivery-map');
 if (mapElement?.dataset.key) {
     window.glowyInitDeliveryMap = () => {

@@ -42,4 +42,20 @@ class HomePageTest extends TestCase
             ->assertSee('لماذا Glowy؟')
             ->assertSee('سيروم الهيالورونيك');
     }
+
+    public function test_homepage_renders_editorial_media_and_progressive_motion_hooks(): void
+    {
+        $this->assertFileExists(public_path('images/editorial/glowy-hero.webp'));
+        $this->assertFileExists(public_path('images/editorial/glowy-routine.webp'));
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('images/editorial/glowy-hero.webp', false)
+            ->assertSee('images/editorial/glowy-routine.webp', false)
+            ->assertSee('data-reveal', false)
+            ->assertSee('data-parallax', false)
+            ->assertSee('data-marquee', false)
+            ->assertSee('data-marquee-toggle', false)
+            ->assertSee('aria-pressed="false"', false);
+    }
 }

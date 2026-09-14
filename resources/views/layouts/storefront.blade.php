@@ -12,15 +12,15 @@
         <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen overflow-x-hidden bg-glowy-ivory font-sans text-glowy-ink antialiased" x-data="{ menuOpen: false, cartOpen: false }">
+    <body class="storefront-shell min-h-screen overflow-x-hidden bg-glowy-ivory font-sans text-glowy-ink antialiased" x-data="{ menuOpen: false, cartOpen: false }">
         <a href="#main-content" class="sr-only z-50 rounded-full bg-glowy-plum px-4 py-3 text-white focus:not-sr-only focus:fixed focus:start-4 focus:top-4">انتقلي إلى المحتوى</a>
 
         <div class="bg-glowy-plum px-4 py-2 text-center text-xs font-medium text-white sm:text-sm">توصيل محسوب بدقة حسب موقعك ✦ الدفع عند الاستلام</div>
 
-        <header class="sticky top-0 z-40 border-b border-glowy-champagne/70 bg-glowy-ivory/95 backdrop-blur">
+        <header class="sticky top-0 z-40 border-b border-glowy-champagne/70 bg-glowy-ivory/95 backdrop-blur" data-site-header>
             <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
                 <button type="button" class="rounded-full p-2 lg:hidden" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-label="فتح القائمة"><span class="text-2xl">☰</span></button>
-                <a href="{{ route('home') }}" class="block" aria-label="Glowy الرئيسية"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-32 sm:w-40"></a>
+                <a href="{{ route('home') }}" class="block" aria-label="Glowy الرئيسية"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-32 sm:w-40" data-site-logo></a>
                 <nav class="hidden items-center gap-5 text-sm font-bold lg:flex" aria-label="التنقل الرئيسي">
                     <a class="transition hover:text-glowy-rose" href="{{ route('home') }}">الرئيسية</a>
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index') }}">المنتجات</a>
