@@ -1,12 +1,17 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliverySettingController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\ProductVariantController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
+use App\Http\Controllers\Admin\TaxonomyController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Storefront\BrandController as StorefrontBrandController;
@@ -52,9 +57,22 @@ Route::get('/admin', DashboardController::class)
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.access'])->group(function (): void {
     Route::get('brands', [BrandController::class, 'index'])->name('brands.index');
     Route::post('brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::post('users', [AdminUserController::class, 'store'])->name('users.store');
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::patch('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::get('concerns', [TaxonomyController::class, 'concerns'])->name('concerns.index');
+    Route::post('concerns', [TaxonomyController::class, 'storeConcern'])->name('concerns.store');
+    Route::get('skin-types', [TaxonomyController::class, 'skinTypes'])->name('skin-types.index');
+    Route::post('skin-types', [TaxonomyController::class, 'storeSkinType'])->name('skin-types.store');
+    Route::get('ingredients', [TaxonomyController::class, 'ingredients'])->name('ingredients.index');
+    Route::post('ingredients', [TaxonomyController::class, 'storeIngredient'])->name('ingredients.store');
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
+    Route::post('products/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
+    Route::post('products/{product}/images', [ProductImageController::class, 'store'])->name('products.images.store');
     Route::get('stock/adjustments', [StockAdjustmentController::class, 'index'])->name('stock.adjustments.index');
     Route::post('stock/adjustments', [StockAdjustmentController::class, 'store'])->name('stock.adjustments.store');
     Route::get('delivery', [DeliverySettingController::class, 'index'])->name('delivery.index');

@@ -10,4 +10,14 @@
         <label class="grid gap-2 text-sm font-bold">التصنيف<select name="category_id" class="min-h-11 rounded-xl border-glowy-champagne"><option value="">—</option>@foreach ($categories as $category)<option value="{{ $category->id }}">{{ $category->name_ar }}</option>@endforeach</select></label>
         <x-ui.button type="submit" class="md:col-span-2">إضافة المنتج</x-ui.button>
     </form>
+    <div class="mt-8 grid gap-4">
+        @forelse($products as $product)
+            <article class="rounded-3xl border border-glowy-champagne bg-white p-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h2 class="text-lg font-bold text-glowy-plum">{{ $product->name_ar }}</h2><p class="text-sm text-glowy-muted">{{ $product->brand?->name_ar ?? 'بدون ماركة' }}</p></div><span class="rounded-full bg-glowy-blush px-3 py-1 text-sm">{{ $product->variants->count() }} متغيرات</span></div>
+                <div class="mt-4 grid gap-2 text-sm">@foreach($product->variants as $variant)<div class="flex justify-between rounded-xl bg-glowy-ivory px-3 py-2"><span dir="ltr">{{ $variant->sku }}</span><span>{{ $variant->price }} د.ل · {{ $variant->stock_quantity }} متاح</span></div>@endforeach</div>
+                <form class="mt-4 grid gap-3 md:grid-cols-3" method="POST" action="{{ route('admin.products.variants.store', $product) }}">@csrf <x-ui.input name="sku" label="SKU" required /><x-ui.input name="price" label="السعر" inputmode="decimal" required /><x-ui.input name="stock_quantity" label="الكمية الافتتاحية" type="number" required /><input type="hidden" name="low_stock_threshold" value="5"><input type="hidden" name="is_active" value="1"><x-ui.button type="submit">إضافة متغير</x-ui.button></form>
+                <form class="mt-3 flex flex-wrap items-end gap-3" method="POST" action="{{ route('admin.products.images.store', $product) }}" enctype="multipart/form-data">@csrf <label class="grid gap-1 text-sm font-bold">صورة المنتج<input class="text-sm" type="file" name="image" accept="image/*" required></label><x-ui.input name="alt" label="وصف الصورة" /><x-ui.button type="submit">رفع الصورة</x-ui.button></form>
+            </article>
+        @empty <p class="rounded-3xl bg-white p-8 text-center text-glowy-muted">لا توجد منتجات بعد.</p>@endforelse
+        {{ $products->links() }}
+    </div>
 </x-layouts.admin>

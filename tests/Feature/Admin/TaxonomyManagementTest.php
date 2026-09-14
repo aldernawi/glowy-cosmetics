@@ -26,4 +26,30 @@ class TaxonomyManagementTest extends TestCase
 
         $this->assertNull($parent->refresh()->parent_id);
     }
+
+    public function test_an_administrator_can_create_a_category_from_the_taxonomy_workspace(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
+
+        $this->actingAs($admin)
+            ->post(route('admin.categories.store'), ['name_ar' => 'واقي الشمس', 'slug' => 'sun-care', 'is_active' => true])
+            ->assertRedirect(route('admin.categories.index'));
+
+        $this->assertDatabaseHas('categories', ['name_ar' => 'واقي الشمس', 'slug' => 'sun-care', 'is_active' => true]);
+    }
+
+    public function test_an_administrator_can_create_a_skin_concern(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
+
+        $this->actingAs($admin)
+            ->post(route('admin.concerns.store'), ['name_ar' => 'الجفاف', 'slug' => 'dryness', 'is_active' => true])
+            ->assertRedirect(route('admin.concerns.index'));
+
+        $this->assertDatabaseHas('concerns', ['name_ar' => 'الجفاف', 'slug' => 'dryness', 'is_active' => true]);
+    }
 }

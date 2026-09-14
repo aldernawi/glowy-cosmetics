@@ -16,10 +16,14 @@
                 <nav class="mt-8 grid gap-1 text-sm" aria-label="التنقل الإداري">
                     <a href="{{ route('admin.dashboard') }}" class="rounded-xl bg-white/10 px-4 py-3 font-bold">لوحة التحكم</a>
                     <a href="{{ route('admin.orders.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">الطلبات</a>
+                    <a href="{{ route('admin.customers.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">العملاء</a>
                     <a href="{{ route('admin.brands.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">الماركات</a>
                     <a href="{{ route('admin.products.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المنتجات</a>
+                    <a href="{{ route('admin.categories.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">التصنيفات</a>
+                    <a href="{{ route('admin.concerns.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">احتياجات البشرة</a>
                     <a href="{{ route('admin.stock.adjustments.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المخزون</a>
                     <a href="{{ route('admin.delivery.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">التوصيل</a>
+                    <a href="{{ route('admin.users.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المستخدمون والصلاحيات</a>
                     <span class="rounded-xl px-4 py-3 text-white/55">الإعدادات — قريبًا</span>
                 </nav>
             </aside>
