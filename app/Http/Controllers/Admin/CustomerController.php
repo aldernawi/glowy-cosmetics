@@ -12,4 +12,11 @@ class CustomerController extends Controller
     {
         return view('admin.customers.index', ['customers' => User::query()->withCount('orders')->doesntHave('roles')->latest()->paginate(24)]);
     }
+
+    public function show(User $customer): View
+    {
+        abort_if($customer->hasAnyRole(['administrator', 'catalog-manager']), 404);
+
+        return view('admin.customers.show', ['customer' => $customer->load(['orders.items'])]);
+    }
 }
