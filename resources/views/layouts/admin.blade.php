@@ -22,6 +22,8 @@
                     <a href="{{ route('admin.categories.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">التصنيفات</a>
                     <a href="{{ route('admin.concerns.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">احتياجات البشرة</a>
                     <a href="{{ route('admin.stock.adjustments.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المخزون</a>
+                    <a href="{{ route('admin.stock.low.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">منخفض المخزون</a>
+                    <a href="{{ route('admin.stock.movements.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">حركات المخزون</a>
                     <a href="{{ route('admin.delivery.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">التوصيل</a>
                     <a href="{{ route('admin.users.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المستخدمون والصلاحيات</a>
                     <span class="rounded-xl px-4 py-3 text-white/55">الإعدادات — قريبًا</span>

@@ -52,4 +52,15 @@ class TaxonomyManagementTest extends TestCase
 
         $this->assertDatabaseHas('concerns', ['name_ar' => 'الجفاف', 'slug' => 'dryness', 'is_active' => true]);
     }
+
+    public function test_an_administrator_can_remove_an_empty_category(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
+        $category = Category::query()->create(['name_ar' => 'الجسم', 'slug' => 'body']);
+
+        $this->actingAs($admin)->delete(route('admin.categories.destroy', $category))->assertRedirect(route('admin.categories.index'));
+        $this->assertModelMissing($category);
+    }
 }

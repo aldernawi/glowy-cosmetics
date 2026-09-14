@@ -29,4 +29,19 @@ class ProductImageManagementTest extends TestCase
         $path = $product->images()->sole()->path;
         Storage::disk('public')->assertExists($path);
     }
+
+    public function test_an_administrator_can_remove_a_product_image_and_its_file(): void
+    {
+        Storage::fake('public');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
+        $product = Product::query()->create(['name_ar' => 'غسول', 'slug' => 'cleanser']);
+        $image = $product->images()->create(['path' => 'products/1/old.webp']);
+        Storage::disk('public')->put($image->path, 'image');
+
+        $this->actingAs($admin)->delete(route('admin.images.destroy', $image))->assertRedirect(route('admin.products.index'));
+        $this->assertModelMissing($image);
+        Storage::disk('public')->assertMissing('products/1/old.webp');
+    }
 }

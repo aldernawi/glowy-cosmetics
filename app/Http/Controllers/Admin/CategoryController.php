@@ -31,4 +31,12 @@ class CategoryController extends Controller
 
         return back()->with('status', 'تم تحديث التصنيف.');
     }
+
+    public function destroy(Category $category): RedirectResponse
+    {
+        abort_if($category->children()->exists() || $category->products()->exists(), 422, 'لا يمكن حذف تصنيف مرتبط.');
+        $category->delete();
+
+        return to_route('admin.categories.index')->with('status', 'تم حذف التصنيف.');
+    }
 }
