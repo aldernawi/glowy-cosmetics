@@ -13,7 +13,7 @@ class ProductVariant extends Model
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'is_default' => 'boolean', 'price' => 'decimal:3', 'compare_at_price' => 'decimal:3'];
+        return ['is_active' => 'boolean', 'is_default' => 'boolean', 'stock_quantity' => 'integer', 'low_stock_threshold' => 'integer', 'price' => 'decimal:3', 'compare_at_price' => 'decimal:3'];
     }
 
     public function product(): BelongsTo

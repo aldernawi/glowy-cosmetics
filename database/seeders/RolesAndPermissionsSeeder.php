@@ -14,7 +14,11 @@ class RolesAndPermissionsSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $permission = Permission::findOrCreate('admin.access', 'web');
+        $catalogPermission = Permission::findOrCreate('catalog.manage', 'web');
         $administrator = Role::findOrCreate('administrator', 'web');
-        $administrator->givePermissionTo($permission);
+        $catalogManager = Role::findOrCreate('catalog-manager', 'web');
+
+        $administrator->syncPermissions([$permission, $catalogPermission]);
+        $catalogManager->syncPermissions([$permission, $catalogPermission]);
     }
 }
