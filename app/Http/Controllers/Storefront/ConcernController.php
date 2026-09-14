@@ -16,7 +16,7 @@ class ConcernController extends Controller
             'eyebrow' => 'عناية تناسب احتياج بشرتك',
             'title' => $concern->name_ar,
             'description' => $concern->description,
-            'products' => $concern->products()->where('is_active', true)
+            'products' => $concern->products()->sellable()
                 ->with(['brand', 'images', 'variants' => fn ($query) => $query->where('is_active', true)])
                 ->latest()->paginate(24),
         ]);

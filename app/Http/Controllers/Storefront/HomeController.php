@@ -19,8 +19,8 @@ class HomeController extends Controller
             'concerns' => Concern::query()->where('is_active', true)->orderBy('sort_order')->limit(8)->get(),
             'categories' => Category::query()->where('is_active', true)->where('is_featured', true)->orderBy('sort_order')->limit(8)->get(),
             'brands' => Brand::query()->where('is_active', true)->where('is_featured', true)->orderBy('sort_order')->limit(8)->get(),
-            'newProducts' => Product::query()->where('is_active', true)->where('is_new', true)->with($productRelations)->latest()->limit(4)->get(),
-            'bestSellers' => Product::query()->where('is_active', true)->where('is_featured', true)->with($productRelations)->latest()->limit(4)->get(),
+            'newProducts' => Product::query()->sellable()->where('is_new', true)->with($productRelations)->latest()->limit(4)->get(),
+            'bestSellers' => Product::query()->sellable()->where('is_featured', true)->with($productRelations)->latest()->limit(4)->get(),
         ]);
     }
 }

@@ -16,7 +16,7 @@ class BrandController extends Controller
             'eyebrow' => 'تسوّقي حسب الماركة',
             'title' => $brand->name_ar,
             'description' => $brand->description,
-            'products' => $brand->products()->where('is_active', true)
+            'products' => $brand->products()->sellable()
                 ->with(['brand', 'images', 'variants' => fn ($query) => $query->where('is_active', true)])
                 ->latest()->paginate(24),
         ]);
