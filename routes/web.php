@@ -73,6 +73,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::post('ingredients', [TaxonomyController::class, 'storeIngredient'])->name('ingredients.store');
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
+    Route::patch('products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
     Route::post('products/{product}/variants', [ProductVariantController::class, 'store'])->name('products.variants.store');
     Route::patch('variants/{variant}', [ProductVariantController::class, 'update'])->name('variants.update');
     Route::delete('variants/{variant}', [ProductVariantController::class, 'destroy'])->name('variants.destroy');
