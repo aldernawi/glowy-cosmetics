@@ -11,6 +11,8 @@ class CartController extends Controller
 {
     public function __invoke(Request $request, CartService $carts): View
     {
-        return view('storefront.cart.index', ['cart' => $carts->resolve($request)->load('items.productVariant.product')]);
+        $cart = $carts->resolve($request)->load('items.productVariant.product.images');
+
+        return view('storefront.cart.index', ['cart' => $cart, 'subtotal' => $carts->subtotal($cart)]);
     }
 }

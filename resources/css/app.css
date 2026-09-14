@@ -16,3 +16,18 @@
     --font-sans: Tajawal, Arial, sans-serif;
     --font-display: Alexandria, Tajawal, Arial, sans-serif;
 }
+
+[x-cloak] {
+    display: none !important;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+button,
+a,
+input,
+select {
+    -webkit-tap-highlight-color: transparent;
+}

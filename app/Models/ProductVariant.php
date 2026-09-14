@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,5 +24,11 @@ class ProductVariant extends Model
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
+    }
+
+    public function isOnSale(): bool
+    {
+        return $this->compare_at_price !== null
+            && BigDecimal::of($this->compare_at_price)->isGreaterThan(BigDecimal::of($this->price));
     }
 }

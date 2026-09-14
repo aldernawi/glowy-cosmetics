@@ -1,30 +1,35 @@
 <x-layouts.storefront :title="$product->name_ar . ' | Glowy'">
     @php($variant = $product->variants->firstWhere('is_default', true) ?? $product->variants->first())
-    <section class="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-2 sm:px-8">
-        <div class="aspect-square rounded-3xl bg-glowy-blush p-8">
-            @if ($product->images->first())
-                <img src="{{ $product->images->first()->path }}" alt="{{ $product->name_ar }}" class="h-full w-full object-cover" loading="eager">
-            @else
-                <span class="flex h-full items-center justify-center text-7xl text-glowy-rose" aria-hidden="true">✦</span>
-            @endif
-        </div>
-        <div class="self-center">
-            <p class="text-sm font-bold text-glowy-rose">{{ $product->brand?->name_ar }}</p>
-            <h1 class="mt-2 text-3xl font-bold text-glowy-plum sm:text-4xl">{{ $product->name_ar }}</h1>
-            @if ($product->description)<p class="mt-5 leading-8 text-glowy-muted">{{ $product->description }}</p>@endif
-            @if ($variant)
-                <p class="mt-6 text-2xl font-bold text-glowy-rose">{{ $variant->price }} د.ل</p>
-                @if ($variant->stock_quantity > 0)
-                    <form action="{{ route('cart.items.store') }}" method="POST" class="mt-6 flex gap-3">
-                        @csrf
-                        <input type="hidden" name="product_variant_id" value="{{ $variant->id }}">
-                        <input type="number" name="quantity" value="1" min="1" max="{{ $variant->stock_quantity }}" class="min-h-11 w-20 rounded-full border-glowy-champagne text-center" aria-label="الكمية">
-                        <x-ui.button type="submit">أضيفي إلى السلة</x-ui.button>
-                    </form>
-                @else
-                    <p class="mt-6 font-bold text-glowy-muted">نفد من المخزون حاليًا</p>
-                @endif
-            @endif
+    @php($firstImage = $product->images->first())
+    <section class="mx-auto max-w-7xl px-5 py-10 sm:px-8">
+        <nav class="mb-8 text-sm text-glowy-muted" aria-label="مسار التنقل"><a href="{{ route('home') }}">الرئيسية</a> <span class="mx-2">/</span><a href="{{ route('products.index') }}">المنتجات</a><span class="mx-2">/</span><span>{{ $product->name_ar }}</span></nav>
+        <div class="grid gap-10 lg:grid-cols-2" x-data="{ image: @js($firstImage?->path) }">
+            <div>
+                <div class="aspect-square overflow-hidden rounded-[2rem] bg-glowy-blush p-8">
+                    @if ($firstImage)<img :src="image" src="{{ $firstImage->path }}" alt="{{ $firstImage->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" fetchpriority="high">@else<span class="flex h-full items-center justify-center text-7xl text-glowy-rose">✦</span>@endif
+                </div>
+                @if($product->images->count() > 1)<div class="mt-4 grid grid-cols-5 gap-3">@foreach($product->images as $image)<button type="button" @click="image = @js($image->path)" class="aspect-square rounded-2xl border border-glowy-champagne bg-white p-2 focus:border-glowy-rose"><img src="{{ $image->path }}" alt="{{ $image->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" loading="lazy"></button>@endforeach</div>@endif
+            </div>
+
+            <div class="self-start lg:sticky lg:top-6">
+                @if($product->brand)<a href="{{ route('brands.show', $product->brand) }}" class="text-sm font-bold text-glowy-rose">{{ $product->brand->name_ar }}</a>@endif
+                <h1 class="mt-2 font-display text-3xl font-bold text-glowy-plum sm:text-5xl">{{ $product->name_ar }}</h1>
+                @if($product->name_en)<p class="mt-2 font-sans text-sm text-glowy-muted" dir="ltr">{{ $product->name_en }}</p>@endif
+                @if ($product->description)<p class="mt-6 whitespace-pre-line leading-8 text-glowy-muted">{{ $product->description }}</p>@endif
+
+                @if($product->variants->isNotEmpty())
+                    <div class="mt-7"><h2 class="mb-3 text-sm font-bold">اختاري الحجم أو النوع</h2><div class="space-y-3">@foreach($product->variants as $choice)<form action="{{ route('cart.items.store') }}" method="POST" class="flex flex-col gap-3 rounded-2xl border border-glowy-champagne bg-white p-4 sm:flex-row sm:items-center sm:justify-between">@csrf<input type="hidden" name="product_variant_id" value="{{ $choice->id }}"><div><p class="font-bold">{{ $choice->name ?: ($choice->size ?: 'الحجم الافتراضي') }}</p>@if($choice->name && $choice->size)<p class="text-xs text-glowy-muted">{{ $choice->size }}</p>@endif<p class="mt-1 font-bold text-glowy-rose">{{ $choice->price }} د.ل</p></div>@if($choice->stock_quantity > 0)<div class="flex items-center gap-2"><input type="number" name="quantity" value="1" min="1" max="{{ $choice->stock_quantity }}" class="w-16 rounded-full border-glowy-champagne text-center" aria-label="كمية {{ $choice->name ?: $choice->size }}"><x-ui.button type="submit">أضيفي إلى السلة</x-ui.button></div>@else<span class="text-sm font-bold text-glowy-muted">نفد حاليًا</span>@endif</form>@endforeach</div></div>
+                @else<p class="mt-7 font-bold text-glowy-muted">غير متوفر حاليًا</p>@endif
+                <div class="mt-7 grid grid-cols-2 gap-3 text-sm"><div class="rounded-2xl bg-glowy-blush p-4"><strong class="block">دفع عند الاستلام</strong><span class="text-glowy-muted">بدون دفع إلكتروني</span></div><div class="rounded-2xl bg-glowy-blush p-4"><strong class="block">توصيل دقيق</strong><span class="text-glowy-muted">حسب مسافة الطريق</span></div></div>
+            </div>
         </div>
     </section>
+
+    @if($product->benefits || $product->usage || $product->warnings || $product->ingredients->isNotEmpty())
+        <section class="bg-white py-14"><div class="mx-auto grid max-w-7xl gap-5 px-5 sm:px-8 md:grid-cols-2">@if($product->benefits)<article class="rounded-3xl bg-glowy-blush p-7"><h2 class="font-display text-xl font-bold">الفوائد</h2><p class="mt-3 whitespace-pre-line leading-8 text-glowy-muted">{{ $product->benefits }}</p></article>@endif @if($product->usage)<article class="rounded-3xl bg-glowy-blush p-7"><h2 class="font-display text-xl font-bold">طريقة الاستخدام</h2><p class="mt-3 whitespace-pre-line leading-8 text-glowy-muted">{{ $product->usage }}</p></article>@endif @if($product->warnings)<article class="rounded-3xl border border-glowy-champagne p-7"><h2 class="font-display text-xl font-bold">تنبيهات</h2><p class="mt-3 whitespace-pre-line leading-8 text-glowy-muted">{{ $product->warnings }}</p></article>@endif @if($product->ingredients->isNotEmpty())<article class="rounded-3xl border border-glowy-champagne p-7"><h2 class="font-display text-xl font-bold">المكونات البارزة</h2><div class="mt-4 flex flex-wrap gap-2">@foreach($product->ingredients as $ingredient)<span class="rounded-full bg-glowy-blush px-3 py-1.5 text-sm">{{ $ingredient->name_ar }}</span>@endforeach</div></article>@endif</div></section>
+    @endif
+
+    @if($product->concerns->isNotEmpty() || $product->skinTypes->isNotEmpty())<section class="mx-auto max-w-7xl px-5 py-12 sm:px-8"><div class="flex flex-wrap gap-3">@foreach($product->concerns as $concern)<a href="{{ route('concerns.show', $concern) }}" class="rounded-full bg-glowy-blush px-4 py-2 text-sm font-bold text-glowy-rose">{{ $concern->name_ar }}</a>@endforeach @foreach($product->skinTypes as $skinType)<span class="rounded-full border border-glowy-champagne px-4 py-2 text-sm">مناسب للبشرة {{ $skinType->name_ar }}</span>@endforeach</div></section>@endif
+
+    @if($relatedProducts->isNotEmpty())<section class="mx-auto max-w-7xl px-5 py-14 sm:px-8"><h2 class="font-display text-3xl font-bold text-glowy-plum">قد يعجبك أيضًا</h2><div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">@foreach($relatedProducts as $related)<x-storefront.product-card :product="$related" />@endforeach</div></section>@endif
 </x-layouts.storefront>

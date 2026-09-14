@@ -12,6 +12,11 @@ class Brand extends Model
 
     protected $guarded = [];
 
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     protected function casts(): array
     {
         return ['is_active' => 'boolean', 'is_featured' => 'boolean'];

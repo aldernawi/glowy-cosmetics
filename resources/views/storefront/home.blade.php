@@ -1,23 +1,36 @@
 <x-layouts.storefront title="Glowy | عناية تستحقها بشرتك">
     <section class="relative overflow-hidden bg-glowy-blush">
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-2 lg:items-center lg:px-8">
-            <div class="relative z-10 max-w-xl">
-                <p class="mb-5 inline-flex rounded-full bg-white px-4 py-2 text-sm font-semibold text-glowy-rose">اختيارات موثوقة لبشرتك</p>
-                <h1 class="text-4xl font-bold leading-tight tracking-tight text-glowy-plum sm:text-5xl lg:text-6xl">كل بشرة تستحق<br>لحظة <span class="text-glowy-rose">Glowy ✨</span></h1>
-                <p class="mt-6 text-base leading-8 text-glowy-muted sm:text-lg">روتين عناية ناعم وواضح، ومنتجات مختارة لتشعري بالثقة في كل يوم.</p>
-                <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="#" class="rounded-full bg-glowy-rose px-6 py-3 font-bold text-white shadow-sm transition hover:bg-glowy-plum">تسوقي الآن</a>
-                    <a href="#" class="rounded-full border border-glowy-rose px-6 py-3 font-bold text-glowy-rose transition hover:bg-white">اكتشفي روتينك</a>
-                </div>
+        <div class="absolute inset-y-0 start-0 hidden w-1/3 rounded-e-full bg-white/35 lg:block"></div>
+        <div class="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
+            <div class="max-w-2xl">
+                <p class="mb-5 inline-flex rounded-full bg-white px-4 py-2 text-sm font-bold text-glowy-rose">اختيارات موثوقة لبشرتك ✦</p>
+                <h1 class="font-display text-4xl font-bold leading-tight text-glowy-plum sm:text-6xl">كل بشرة تستحق<br>لحظة <span class="text-glowy-rose">Glowy</span></h1>
+                <p class="mt-6 max-w-xl text-lg leading-9 text-glowy-muted">منتجات عناية أصلية ومختارة بعناية، لتبني روتينًا بسيطًا يناسب بشرتك ويمنحها وهجها الطبيعي.</p>
+                <div class="mt-8 flex flex-wrap gap-3"><a href="{{ route('products.index') }}" class="rounded-full bg-glowy-rose px-7 py-3.5 font-bold text-white transition hover:bg-glowy-plum">تسوّقي الآن</a><a href="#routine" class="rounded-full border border-glowy-rose px-7 py-3.5 font-bold text-glowy-rose transition hover:bg-white">اكتشفي روتينك</a></div>
             </div>
-            <div class="relative min-h-72 overflow-hidden rounded-[2.5rem] bg-glowy-champagne p-8 sm:min-h-96">
-                <div class="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/60"></div>
-                <div class="absolute bottom-8 right-8 rounded-[2rem] bg-white px-7 py-8 shadow-sm">
-                    <p class="text-xs font-semibold text-glowy-muted">لحظتك اليومية</p>
-                    <p class="mt-1 text-2xl font-bold text-glowy-plum">Glow begins here</p>
-                    <p class="mt-4 text-glowy-rose">✦ ✦ ✦</p>
-                </div>
+            <div class="relative min-h-80 overflow-hidden rounded-[3rem] bg-glowy-champagne p-8 sm:min-h-[28rem]">
+                <div class="absolute -end-16 -top-16 h-56 w-56 rounded-full bg-white/60"></div><span class="absolute end-12 top-12 text-5xl text-glowy-rose">✦</span>
+                <div class="absolute inset-x-8 bottom-8 rounded-[2rem] bg-white/90 p-7"><p class="text-sm font-bold text-glowy-rose">Glow begins with care</p><p class="mt-2 font-display text-2xl font-bold text-glowy-plum">عناية راقية، بلا تعقيد</p><p class="mt-3 leading-7 text-glowy-muted">نساعدك على اختيار ما تحتاجه بشرتك فعلًا.</p></div>
             </div>
         </div>
     </section>
+
+    <section class="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+        <div class="mb-8"><p class="text-sm font-bold text-glowy-rose">ابدئي من احتياجك</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">تسوّقي حسب احتياج بشرتك</h2></div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">@forelse($concerns as $concern)<a href="{{ route('concerns.show', $concern) }}" class="rounded-3xl border border-glowy-champagne bg-white p-6 transition hover:border-glowy-rose"><span class="text-2xl text-glowy-rose">✦</span><h3 class="mt-5 font-display text-lg font-bold">{{ $concern->name_ar }}</h3><p class="mt-2 text-sm leading-6 text-glowy-muted">{{ $concern->description ?: 'اختيارات مدروسة تساعدك على العناية بهذا الاحتياج.' }}</p></a>@empty<p class="text-glowy-muted">ستظهر احتياجات البشرة هنا بعد إضافتها.</p>@endforelse</div>
+    </section>
+
+    <section class="bg-white py-16"><div class="mx-auto max-w-7xl px-5 sm:px-8"><div class="mb-8 flex items-end justify-between"><div><p class="text-sm font-bold text-glowy-rose">اختاري ما تحبين</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">تسوّقي حسب التصنيف</h2></div><a href="{{ route('products.index') }}" class="text-sm font-bold text-glowy-rose">عرض الكل ←</a></div><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">@forelse($categories as $category)<a href="{{ route('products.index', ['category' => $category->slug]) }}" class="group overflow-hidden rounded-3xl bg-glowy-blush"><div class="aspect-[4/3] p-5">@if($category->image_path)<img src="{{ $category->image_path }}" alt="{{ $category->name_ar }}" class="h-full w-full object-contain">@else<div class="flex h-full items-center justify-center text-5xl text-glowy-rose">✦</div>@endif</div><h3 class="px-5 pb-5 font-display text-lg font-bold group-hover:text-glowy-rose">{{ $category->name_ar }}</h3></a>@empty<p class="text-glowy-muted">ستظهر التصنيفات المختارة هنا.</p>@endforelse</div></div></section>
+
+    @foreach ([['title' => 'وصل حديثًا', 'caption' => 'اختيارات جديدة تستحق التجربة', 'items' => $newProducts], ['title' => 'الأكثر طلبًا', 'caption' => 'مفضلات عميلات Glowy', 'items' => $bestSellers]] as $section)
+        <section class="mx-auto max-w-7xl px-5 py-16 sm:px-8"><div class="mb-8 flex items-end justify-between"><div><p class="text-sm font-bold text-glowy-rose">{{ $section['caption'] }}</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">{{ $section['title'] }}</h2></div><a href="{{ route('products.index') }}" class="text-sm font-bold text-glowy-rose">كل المنتجات ←</a></div><div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">@forelse($section['items'] as $product)<x-storefront.product-card :product="$product" />@empty<p class="text-glowy-muted sm:col-span-2 lg:col-span-4">نحضّر لك اختيارات جميلة قريبًا.</p>@endforelse</div></section>
+    @endforeach
+
+    <section class="mx-auto max-w-7xl px-5 py-8 sm:px-8"><div class="grid overflow-hidden rounded-[2.5rem] bg-glowy-plum text-white lg:grid-cols-2"><div class="p-8 sm:p-12"><p class="text-sm font-bold text-glowy-champagne">اختيار الأسبوع</p><h2 class="mt-3 font-display text-3xl font-bold">روتينك يبدأ بخطوة صحيحة</h2><p class="mt-4 leading-8 text-white/75">ابدئي بغسول لطيف، ثم عالجي احتياج بشرتك، اختمي بالترطيب ولا تنسي الحماية من الشمس صباحًا.</p><a href="{{ route('products.index') }}" class="mt-7 inline-flex rounded-full bg-white px-6 py-3 font-bold text-glowy-plum">كوّني روتينك</a></div><div class="min-h-72 bg-glowy-champagne/30 p-10"><div class="flex h-full items-center justify-center text-8xl text-glowy-champagne">✦</div></div></div></section>
+
+    <section class="bg-white py-16"><div class="mx-auto max-w-7xl px-5 sm:px-8"><div class="mb-8"><p class="text-sm font-bold text-glowy-rose">أسماء مختارة بعناية</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">ماركات نثق بها</h2></div><div class="flex flex-wrap gap-3">@forelse($brands as $brand)<a href="{{ route('brands.show', $brand) }}" class="min-w-36 flex-1 rounded-2xl border border-glowy-champagne px-6 py-5 text-center font-display font-bold transition hover:border-glowy-rose">{{ $brand->name_ar }}</a>@empty<p class="text-glowy-muted">ستظهر الماركات المميزة هنا.</p>@endforelse</div></div></section>
+
+    <section id="routine" class="mx-auto max-w-7xl px-5 py-16 sm:px-8"><div class="text-center"><p class="text-sm font-bold text-glowy-rose">خطوات واضحة كل يوم</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">روتين عناية أبسط</h2></div><div class="mt-10 grid gap-5 md:grid-cols-4">@foreach([['01','نظّفي','ابدئي بغسول مناسب لنوع بشرتك.'],['02','عالجي','استخدمي السيروم المخصص لاحتياجك.'],['03','رطّبي','ادعمي حاجز البشرة بمرطب لطيف.'],['04','احمي','ضعي واقي الشمس كل صباح.']] as $step)<div class="rounded-3xl bg-glowy-blush p-6"><span class="font-display text-sm font-bold text-glowy-rose">{{ $step[0] }}</span><h3 class="mt-6 font-display text-xl font-bold">{{ $step[1] }}</h3><p class="mt-2 leading-7 text-glowy-muted">{{ $step[2] }}</p></div>@endforeach</div></section>
+
+    <section class="bg-glowy-blush py-16"><div class="mx-auto max-w-7xl px-5 sm:px-8"><div class="text-center"><p class="text-sm font-bold text-glowy-rose">ثقة في كل اختيار</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">لماذا Glowy؟</h2></div><div class="mt-10 grid gap-5 md:grid-cols-3">@foreach([['منتجات أصلية','نهتم بمصدر كل منتج وجودته.'],['اختيارات مفهومة','نرتب العناية حسب احتياج بشرتك.'],['توصيل محسوب بدقة','رسوم واضحة حسب مسافة الطريق الفعلية.']] as $reason)<div class="rounded-3xl bg-white p-7 text-center"><span class="text-3xl text-glowy-rose">✦</span><h3 class="mt-4 font-display text-xl font-bold">{{ $reason[0] }}</h3><p class="mt-2 leading-7 text-glowy-muted">{{ $reason[1] }}</p></div>@endforeach</div></div></section>
 </x-layouts.storefront>

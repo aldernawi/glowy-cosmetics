@@ -4,8 +4,12 @@ namespace App\Services;
 
 use App\Data\CartMergeResult;
 use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\ProductVariant;
 use App\Models\User;
+use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
+use DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +39,48 @@ class CartService
                 $item->update(['quantity' => $finalQuantity]);
             }
         });
+    }
+
+    public function update(Cart $cart, CartItem $cartItem, int $quantity): void
+    {
+        DB::transaction(function () use ($cart, $cartItem, $quantity): void {
+            $item = CartItem::query()->where('cart_id', $cart->id)->lockForUpdate()->findOrFail($cartItem->id);
+            $variant = ProductVariant::query()->lockForUpdate()->findOrFail($item->product_variant_id);
+
+            if (! $variant->is_active || $quantity > $variant->stock_quantity) {
+                throw new DomainException('Insufficient stock for this cart quantity.');
+            }
+
+            $item->update(['quantity' => $quantity]);
+        });
+    }
+
+    public function remove(Cart $cart, CartItem $cartItem): void
+    {
+        CartItem::query()->where('cart_id', $cart->id)->findOrFail($cartItem->id)->delete();
+    }
+
+    public function subtotal(Cart $cart): string
+    {
+        $total = $cart->items->reduce(
+            fn (BigDecimal $sum, CartItem $item) => $sum->plus(BigDecimal::of($item->productVariant->price)->multipliedBy($item->quantity)),
+            BigDecimal::zero(),
+        );
+
+        return (string) $total->toScale(3, RoundingMode::HalfUp);
+    }
+
+    public function find(Request $request): ?Cart
+    {
+        if ($request->user() instanceof User) {
+            return Cart::query()->where('user_id', $request->user()->id)->first();
+        }
+
+        $token = $request->cookie(config('cart.cookie'));
+
+        return is_string($token) && $token !== ''
+            ? Cart::query()->where('guest_token_hash', hash('sha256', $token))->first()
+            : null;
     }
 
     public function resolve(Request $request): Cart

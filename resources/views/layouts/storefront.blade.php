@@ -5,41 +5,57 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ $title ?? 'Glowy | عناية تستحقها بشرتك' }}</title>
+        <meta name="description" content="متجر Glowy لمنتجات العناية بالبشرة والجمال المختارة بعناية.">
+        <link rel="canonical" href="{{ url()->current() }}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen bg-glowy-ivory font-sans text-glowy-ink antialiased">
-        <a href="#main-content" class="sr-only z-50 rounded-full bg-glowy-plum px-4 py-3 text-white focus:not-sr-only focus:fixed focus:right-4 focus:top-4">انتقلي إلى المحتوى</a>
+    <body class="min-h-screen overflow-x-hidden bg-glowy-ivory font-sans text-glowy-ink antialiased" x-data="{ menuOpen: false, cartOpen: false }">
+        <a href="#main-content" class="sr-only z-50 rounded-full bg-glowy-plum px-4 py-3 text-white focus:not-sr-only focus:fixed focus:start-4 focus:top-4">انتقلي إلى المحتوى</a>
 
-        <div class="bg-glowy-plum px-4 py-2 text-center text-xs font-medium text-white sm:text-sm">
-            شحن داخل طرابلس والمناطق القريبة ✨
-        </div>
+        <div class="bg-glowy-plum px-4 py-2 text-center text-xs font-medium text-white sm:text-sm">توصيل محسوب بدقة حسب موقعك ✦ الدفع عند الاستلام</div>
 
-        <header class="border-b border-glowy-champagne/70 bg-glowy-ivory/95">
-            <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-8">
-                <a href="{{ route('home') }}" class="block" aria-label="Glowy الرئيسية"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-36 sm:w-44"></a>
-                <nav class="hidden items-center gap-6 text-sm font-medium lg:flex" aria-label="التنقل الرئيسي">
-                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index') }}">العناية بالبشرة</a>
-                    <a class="transition hover:text-glowy-rose" href="#">واقي الشمس</a>
-                    <a class="transition hover:text-glowy-rose" href="#">العناية بالشعر</a>
-                    <a class="transition hover:text-glowy-rose" href="#">الماركات</a>
-                    <a class="transition hover:text-glowy-rose" href="#">العروض</a>
+        <header class="sticky top-0 z-40 border-b border-glowy-champagne/70 bg-glowy-ivory/95 backdrop-blur">
+            <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-8">
+                <button type="button" class="rounded-full p-2 lg:hidden" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen" aria-label="فتح القائمة"><span class="text-2xl">☰</span></button>
+                <a href="{{ route('home') }}" class="block" aria-label="Glowy الرئيسية"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-32 sm:w-40"></a>
+                <nav class="hidden items-center gap-5 text-sm font-bold lg:flex" aria-label="التنقل الرئيسي">
+                    <a class="transition hover:text-glowy-rose" href="{{ route('home') }}">الرئيسية</a>
+                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index') }}">المنتجات</a>
+                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['category' => 'sunscreen']) }}">واقي الشمس</a>
+                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a>
+                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['sale' => 1]) }}">العروض</a>
                 </nav>
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('login') }}" class="rounded-full px-3 py-2 text-sm font-medium transition hover:bg-glowy-blush">دخول</a>
-                    <a href="{{ route('cart.index') }}" class="rounded-full bg-glowy-rose px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-glowy-plum">السلة</a>
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <a href="{{ route('products.index') }}" class="rounded-full p-2 hover:bg-glowy-blush" aria-label="البحث">⌕</a>
+                    @auth<a href="{{ route('dashboard') }}" class="hidden rounded-full px-3 py-2 text-sm font-bold hover:bg-glowy-blush sm:block">حسابي</a>@else<a href="{{ route('login') }}" class="hidden rounded-full px-3 py-2 text-sm font-bold hover:bg-glowy-blush sm:block">دخول</a>@endauth
+                    <button type="button" @click="cartOpen = true" class="relative rounded-full bg-glowy-rose px-4 py-2 text-sm font-bold text-white transition hover:bg-glowy-plum" aria-label="فتح سلة التسوق">السلة <span class="ms-1 rounded-full bg-white/20 px-1.5">{{ $headerCartCount }}</span></button>
                 </div>
             </div>
+            <div x-cloak x-show="menuOpen" x-transition class="border-t border-glowy-champagne bg-white px-5 py-5 lg:hidden"><nav class="grid gap-4 font-bold"><a href="{{ route('home') }}">الرئيسية</a><a href="{{ route('products.index') }}">كل المنتجات</a><a href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a><a href="{{ route('products.index', ['sale' => 1]) }}">العروض</a>@auth<a href="{{ route('dashboard') }}">حسابي</a>@else<a href="{{ route('login') }}">دخول</a>@endauth</nav></div>
+            <form method="GET" action="{{ route('products.index') }}" class="mx-auto hidden max-w-7xl px-4 pb-4 md:block sm:px-6 lg:px-8"><label class="sr-only" for="header-search">ابحثي في المتجر</label><input id="header-search" name="q" value="{{ request('q') }}" placeholder="ابحثي عن منتج، ماركة أو احتياج لبشرتك..." class="w-full rounded-full border-glowy-champagne bg-white px-5 text-sm"></form>
         </header>
 
-        <main id="main-content">
-            {{ $slot }}
-        </main>
+        <div x-cloak x-show="cartOpen" class="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="سلة التسوق">
+            <button class="absolute inset-0 bg-glowy-plum/45" @click="cartOpen = false" aria-label="إغلاق السلة"></button>
+            <aside x-show="cartOpen" x-transition:enter="transition duration-300" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" class="absolute inset-y-0 end-0 flex w-full max-w-md flex-col bg-glowy-ivory p-6 shadow-2xl">
+                <div class="flex items-center justify-between"><h2 class="font-display text-2xl font-bold">سلتك</h2><button type="button" @click="cartOpen = false" class="rounded-full p-2 text-xl" aria-label="إغلاق">×</button></div>
+                <div class="mt-6 flex-1 space-y-4 overflow-y-auto">
+                    @forelse($headerCart?->items ?? [] as $item)
+                        <div class="flex gap-3 rounded-2xl bg-white p-3"><div class="h-16 w-16 shrink-0 rounded-xl bg-glowy-blush p-1">@if($item->productVariant->product->images->first())<img src="{{ $item->productVariant->product->images->first()->path }}" alt="" class="h-full w-full object-contain">@else<span class="flex h-full items-center justify-center text-glowy-rose">✦</span>@endif</div><div class="min-w-0"><p class="truncate font-bold">{{ $item->productVariant->product->name_ar }}</p><p class="text-sm text-glowy-muted">الكمية: {{ $item->quantity }}</p><p class="text-sm font-bold text-glowy-rose">{{ $item->productVariant->price }} د.ل</p></div></div>
+                    @empty<div class="rounded-3xl bg-glowy-blush p-8 text-center"><span class="text-4xl text-glowy-rose">✦</span><p class="mt-4 font-bold">سلتك تنتظر اختياراتك</p></div>@endforelse
+                </div>
+                <div class="border-t border-glowy-champagne pt-5"><div class="flex justify-between"><span>المجموع الفرعي</span><strong>{{ $headerCartSubtotal }} د.ل</strong></div><a href="{{ route('cart.index') }}" class="mt-4 flex min-h-12 items-center justify-center rounded-full bg-glowy-rose font-bold text-white">عرض السلة</a></div>
+            </aside>
+        </div>
+
+        <main id="main-content">{{ $slot }}</main>
 
         <footer class="mt-16 border-t border-glowy-champagne bg-white">
-            <div class="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-10 text-sm text-glowy-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-                <p>© {{ now()->year }} Glowy. عناية مختارة بحب.</p>
-                <p>جمالك الطبيعي، بطريقتك.</p>
-            </div>
+            <div class="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-4"><div><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="w-36"><p class="mt-4 text-sm leading-7 text-glowy-muted">عناية مختارة بحب لبشرة أكثر صحة ووهجًا.</p></div><div><h2 class="font-display font-bold">تسوّقي</h2><div class="mt-4 grid gap-3 text-sm text-glowy-muted"><a href="{{ route('products.index') }}">كل المنتجات</a><a href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a><a href="{{ route('products.index', ['sale' => 1]) }}">العروض</a></div></div><div><h2 class="font-display font-bold">خدمة العميلات</h2><div class="mt-4 grid gap-3 text-sm text-glowy-muted"><a href="{{ route('cart.index') }}">سلة التسوق</a><a href="{{ route('checkout.index') }}">إتمام الطلب</a>@auth<a href="{{ route('customer.orders.index') }}">طلباتي</a>@endauth</div></div><div><h2 class="font-display font-bold">وعد Glowy</h2><p class="mt-4 text-sm leading-7 text-glowy-muted">منتجات أصلية، تجربة عربية واضحة، وتوصيل برسوم محسوبة من موقعك.</p></div></div>
+            <div class="border-t border-glowy-champagne"><div class="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-5 text-xs text-glowy-muted sm:flex-row sm:justify-between sm:px-8"><p>© {{ now()->year }} Glowy. جميع الحقوق محفوظة.</p><p>جمالك الطبيعي، بطريقتك.</p></div></div>
         </footer>
     </body>
 </html>

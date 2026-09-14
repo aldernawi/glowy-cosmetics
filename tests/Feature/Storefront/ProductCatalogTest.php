@@ -18,8 +18,10 @@ class ProductCatalogTest extends TestCase
             'brand_id' => Brand::query()->create(['name_ar' => 'غلووي', 'slug' => 'glowy'])->id,
             'category_id' => Category::query()->create(['name_ar' => 'العناية', 'slug' => 'skincare'])->id,
             'name_ar' => 'سيروم الترطيب', 'slug' => 'hydration-serum', 'is_active' => true,
+            'benefits' => 'يدعم حاجز البشرة', 'usage' => 'يستخدم مساءً', 'warnings' => 'للاستخدام الخارجي فقط',
         ]);
-        $product->createDefaultVariant('GLW-CATALOG-1', '25.500')->update(['stock_quantity' => 4]);
+        $product->createDefaultVariant('GLW-CATALOG-1', '25.500')->update(['stock_quantity' => 4, 'size' => '30 مل']);
+        $product->variants()->create(['sku' => 'GLW-CATALOG-2', 'name' => 'الحجم الكبير', 'size' => '60 مل', 'price' => '42.000', 'stock_quantity' => 2, 'is_active' => true]);
 
         $this->get(route('products.index'))
             ->assertOk()
@@ -28,6 +30,11 @@ class ProductCatalogTest extends TestCase
         $this->get(route('products.show', $product))
             ->assertOk()
             ->assertSee('سيروم الترطيب')
-            ->assertSee('أضيفي إلى السلة');
+            ->assertSee('أضيفي إلى السلة')
+            ->assertSee('30 مل')
+            ->assertSee('60 مل')
+            ->assertSee('الفوائد')
+            ->assertSee('طريقة الاستخدام')
+            ->assertSee('تنبيهات');
     }
 }
