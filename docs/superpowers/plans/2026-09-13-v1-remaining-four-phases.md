@@ -13,6 +13,8 @@
 
 ## Phase 2 — Complete the premium storefront and catalog
 
+**Status:** Completed and verified on 2026-09-14. Coupons remain excluded by scope.
+
 - Rebuild Homepage around the approved hierarchy: Hero, concerns, categories, new arrivals, best sellers, promotional content, brands, routine, Why Glowy, footer.
 - Load Alexandria/Tajawal/Inter correctly and use the supplied logo across responsive headers.
 - Add product media gallery, details sections, active variants, related/same-brand/routine recommendations, stock states, and responsive product cards.

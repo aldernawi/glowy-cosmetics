@@ -22,7 +22,9 @@ class CartService
             $lockedCart = Cart::query()->lockForUpdate()->findOrFail($cart->id);
             $lockedVariant = ProductVariant::query()->lockForUpdate()->findOrFail($variant->id);
 
-            if (! $lockedVariant->is_active) {
+            $lockedVariant->loadMissing('product');
+
+            if (! $lockedVariant->is_active || ! $lockedVariant->product->is_active) {
                 throw new DomainException('This variant is unavailable.');
             }
 
@@ -47,7 +49,9 @@ class CartService
             $item = CartItem::query()->where('cart_id', $cart->id)->lockForUpdate()->findOrFail($cartItem->id);
             $variant = ProductVariant::query()->lockForUpdate()->findOrFail($item->product_variant_id);
 
-            if (! $variant->is_active || $quantity > $variant->stock_quantity) {
+            $variant->loadMissing('product');
+
+            if (! $variant->is_active || ! $variant->product->is_active || $quantity > $variant->stock_quantity) {
                 throw new DomainException('Insufficient stock for this cart quantity.');
             }
 

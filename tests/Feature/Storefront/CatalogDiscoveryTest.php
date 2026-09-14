@@ -37,4 +37,35 @@ class CatalogDiscoveryTest extends TestCase
         $this->get(route('brands.show', $brand))->assertOk()->assertSee('لاروش');
         $this->get(route('concerns.show', $concern))->assertOk()->assertSee('الجفاف');
     }
+
+    public function test_search_includes_concerns_and_price_bounds_apply_to_the_same_active_variant(): void
+    {
+        $concern = Concern::query()->create(['name_ar' => 'التصبغات', 'slug' => 'pigmentation']);
+        $product = Product::query()->create(['name_ar' => 'عناية مركزة', 'slug' => 'targeted-care']);
+        $product->createDefaultVariant('LOW-PRICE', '5.000')->update(['stock_quantity' => 2]);
+        $product->variants()->create(['sku' => 'HIGH-PRICE', 'price' => '50.000', 'stock_quantity' => 2, 'is_active' => true]);
+        $product->concerns()->attach($concern);
+
+        $this->get(route('products.index', ['q' => 'التصبغات']))->assertOk()->assertSee('عناية مركزة');
+        $this->get(route('products.index', ['min_price' => '10.000', 'max_price' => '20.000']))
+            ->assertOk()->assertDontSee('عناية مركزة');
+    }
+
+    public function test_sale_filter_ignores_inactive_discounted_variants(): void
+    {
+        $product = Product::query()->create(['name_ar' => 'منتج بلا تخفيض فعال', 'slug' => 'no-active-sale']);
+        $product->createDefaultVariant('REGULAR', '20.000')->update(['stock_quantity' => 2]);
+        $product->variants()->create(['sku' => 'OLD-SALE', 'price' => '10.000', 'compare_at_price' => '30.000', 'is_active' => false]);
+
+        $this->get(route('products.index', ['sale' => 1]))->assertOk()->assertDontSee('منتج بلا تخفيض فعال');
+    }
+
+    public function test_catalog_displays_the_lowest_active_price_and_stock_state(): void
+    {
+        $product = Product::query()->create(['name_ar' => 'منتج متعدد الأسعار', 'slug' => 'multi-price']);
+        $product->createDefaultVariant('EXPENSIVE', '100.000')->update(['stock_quantity' => 3]);
+        $product->variants()->create(['sku' => 'AFFORDABLE', 'price' => '5.000', 'stock_quantity' => 0, 'is_active' => true]);
+
+        $this->get(route('products.index'))->assertOk()->assertSee('5.000 د.ل')->assertSee('متوفر');
+    }
 }

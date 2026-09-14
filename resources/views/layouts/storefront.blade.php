@@ -24,7 +24,7 @@
                 <nav class="hidden items-center gap-5 text-sm font-bold lg:flex" aria-label="التنقل الرئيسي">
                     <a class="transition hover:text-glowy-rose" href="{{ route('home') }}">الرئيسية</a>
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index') }}">المنتجات</a>
-                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['category' => 'sunscreen']) }}">واقي الشمس</a>
+                    @if($headerSunscreenCategory)<a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['category' => $headerSunscreenCategory->slug]) }}">واقي الشمس</a>@endif
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a>
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['sale' => 1]) }}">العروض</a>
                 </nav>
@@ -40,7 +40,7 @@
 
         <div x-cloak x-show="cartOpen" class="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="سلة التسوق">
             <button class="absolute inset-0 bg-glowy-plum/45" @click="cartOpen = false" aria-label="إغلاق السلة"></button>
-            <aside x-show="cartOpen" x-transition:enter="transition duration-300" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" class="absolute inset-y-0 end-0 flex w-full max-w-md flex-col bg-glowy-ivory p-6 shadow-2xl">
+            <aside x-show="cartOpen" x-transition:enter="transition duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" class="absolute inset-y-0 end-0 flex w-full max-w-md flex-col bg-glowy-ivory p-6 shadow-2xl">
                 <div class="flex items-center justify-between"><h2 class="font-display text-2xl font-bold">سلتك</h2><button type="button" @click="cartOpen = false" class="rounded-full p-2 text-xl" aria-label="إغلاق">×</button></div>
                 <div class="mt-6 flex-1 space-y-4 overflow-y-auto">
                     @forelse($headerCart?->items ?? [] as $item)

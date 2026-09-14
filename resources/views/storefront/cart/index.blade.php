@@ -22,7 +22,7 @@
                         </article>
                     @endforeach
                 </div>
-                <aside class="h-fit rounded-3xl bg-glowy-blush p-6 lg:sticky lg:top-6"><h2 class="font-display text-xl font-bold">ملخص السلة</h2><div class="mt-6 flex justify-between border-b border-glowy-champagne pb-4"><span class="text-glowy-muted">المجموع الفرعي</span><strong>{{ $subtotal }} د.ل</strong></div><p class="mt-4 text-sm leading-6 text-glowy-muted">تحسب رسوم التوصيل بدقة بعد تحديد موقعك في صفحة إتمام الطلب.</p><a href="{{ route('checkout.index') }}" class="mt-6 flex min-h-12 items-center justify-center rounded-full bg-glowy-rose px-6 font-bold text-white transition hover:bg-glowy-plum">إتمام الطلب</a><a href="{{ route('products.index') }}" class="mt-3 flex justify-center text-sm font-bold text-glowy-rose">متابعة التسوق</a></aside>
+                <aside class="h-fit rounded-3xl bg-glowy-blush p-6 lg:sticky lg:top-36"><h2 class="font-display text-xl font-bold">ملخص السلة</h2><div class="mt-6 flex justify-between border-b border-glowy-champagne pb-4"><span class="text-glowy-muted">المجموع الفرعي</span><strong>{{ $subtotal }} د.ل</strong></div><p class="mt-4 text-sm leading-6 text-glowy-muted">تحسب رسوم التوصيل بدقة بعد تحديد موقعك في صفحة إتمام الطلب.</p><a href="{{ route('checkout.index') }}" class="mt-6 flex min-h-12 items-center justify-center rounded-full bg-glowy-rose px-6 font-bold text-white transition hover:bg-glowy-plum">إتمام الطلب</a><a href="{{ route('products.index') }}" class="mt-3 flex justify-center text-sm font-bold text-glowy-rose">متابعة التسوق</a></aside>
             </div>
         @endif
     </section>

@@ -65,4 +65,31 @@ class CartItemManagementTest extends TestCase
             ->assertRedirect(route('cart.index'))->assertSessionHasErrors('cart');
         $this->assertDatabaseHas('cart_items', ['id' => $item->id, 'quantity' => 1]);
     }
+
+    public function test_customer_cannot_change_an_item_owned_by_another_cart(): void
+    {
+        $variant = Product::query()->create(['name_ar' => 'منتج خاص', 'slug' => 'private-product'])->createDefaultVariant('PRIVATE-1', '8.000');
+        $variant->update(['stock_quantity' => 4]);
+        $owner = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $item = Cart::query()->create(['user_id' => $owner->id])->items()->create(['product_variant_id' => $variant->id, 'quantity' => 1]);
+
+        $this->actingAs($otherUser)->patch(route('cart.items.update', $item), ['quantity' => 2])->assertNotFound();
+        $this->actingAs($otherUser)->delete(route('cart.items.destroy', $item))->assertNotFound();
+        $this->assertDatabaseHas('cart_items', ['id' => $item->id, 'quantity' => 1]);
+    }
+
+    public function test_active_variant_of_an_inactive_product_cannot_be_added(): void
+    {
+        $product = Product::query()->create(['name_ar' => 'منتج مخفي', 'slug' => 'hidden-product', 'is_active' => false]);
+        $variant = $product->createDefaultVariant('HIDDEN-1', '9.000');
+        $variant->update(['stock_quantity' => 4]);
+
+        $this->actingAs(User::factory()->create())->post(route('cart.items.store'), [
+            'product_variant_id' => $variant->id,
+            'quantity' => 1,
+        ])->assertRedirect(route('cart.index'))->assertSessionHasErrors('cart');
+
+        $this->assertDatabaseMissing('cart_items', ['product_variant_id' => $variant->id]);
+    }
 }

@@ -11,6 +11,7 @@ use App\Models\DeliveryTier;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\CheckoutService;
+use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -35,5 +36,21 @@ class CheckoutServiceTest extends TestCase
         $this->assertSame(2, $variant->refresh()->stock_quantity);
         $this->assertDatabaseCount('order_items', 1);
         $this->assertSame('place-1', $order->delivery_place_id);
+    }
+
+    public function test_checkout_rejects_a_variant_when_its_product_was_unpublished(): void
+    {
+        $product = Product::query()->create(['name_ar' => 'منتج مخفي', 'slug' => 'hidden-at-checkout', 'is_active' => false]);
+        $variant = $product->createDefaultVariant('HIDDEN-CHECKOUT', '12.000');
+        $variant->update(['stock_quantity' => 2]);
+        $cart = Cart::query()->create();
+        $cart->items()->create(['product_variant_id' => $variant->id, 'quantity' => 1]);
+        $setting = DeliverySetting::query()->create(['store_latitude' => '32.8872000', 'store_longitude' => '13.1913000']);
+        $tier = DeliveryTier::query()->create(['min_distance_km' => '0.000', 'max_distance_km' => '10.000', 'fee' => '10.000', 'is_active' => true]);
+
+        $this->expectException(DomainException::class);
+        app(CheckoutService::class)->create($cart, null, new DeliveryQuote('5.000', 600, '10.000', $tier->id, $setting->id), [
+            'customer_name' => 'عميلة', 'phone' => '0910000000', 'latitude' => '32.9000000', 'longitude' => '13.2000000',
+        ]);
     }
 }

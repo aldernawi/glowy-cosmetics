@@ -17,7 +17,7 @@ class ProductController extends Controller
     public function index(Request $request): View
     {
         $products = Product::query()
-            ->where('is_active', true)
+            ->sellable()
             ->with(['brand', 'images', 'variants' => fn ($query) => $query->where('is_active', true)])
             ->withMin(['variants as catalog_price' => fn ($query) => $query->where('is_active', true)], 'price')
             ->when($request->filled('q'), function (Builder $query) use ($request): void {
@@ -27,7 +27,9 @@ class ProductController extends Controller
                     $query->where('name_ar', 'like', $term)
                         ->orWhere('name_en', 'like', $term)
                         ->orWhereHas('brand', fn (Builder $brand) => $brand->where('name_ar', 'like', $term)->orWhere('name_en', 'like', $term))
-                        ->orWhereHas('variants', fn (Builder $variant) => $variant->where('sku', 'like', $term));
+                        ->orWhereHas('variants', fn (Builder $variant) => $variant->where('sku', 'like', $term))
+                        ->orWhereHas('concerns', fn (Builder $concern) => $concern->where('name_ar', 'like', $term)->orWhere('name_en', 'like', $term))
+                        ->orWhereHas('skinTypes', fn (Builder $skinType) => $skinType->where('name_ar', 'like', $term)->orWhere('name_en', 'like', $term));
                 });
             })
             ->when($request->filled('brand'), fn (Builder $query) => $query->whereHas('brand', fn (Builder $brand) => $brand->where('slug', $request->string('brand'))))
@@ -35,10 +37,15 @@ class ProductController extends Controller
             ->when($request->filled('concern'), fn (Builder $query) => $query->whereHas('concerns', fn (Builder $concern) => $concern->where('slug', $request->string('concern'))))
             ->when($request->filled('skin_type'), fn (Builder $query) => $query->whereHas('skinTypes', fn (Builder $skinType) => $skinType->where('slug', $request->string('skin_type'))))
             ->when($request->string('availability')->value() === 'in_stock', fn (Builder $query) => $query->whereHas('variants', fn (Builder $variant) => $variant->where('is_active', true)->where('stock_quantity', '>', 0)))
-            ->when($request->boolean('sale'), fn (Builder $query) => $query->whereHas('variants', fn (Builder $variant) => $variant->whereColumn('compare_at_price', '>', 'price')))
+            ->when($request->boolean('sale'), fn (Builder $query) => $query->whereHas('variants', fn (Builder $variant) => $variant->where('is_active', true)->whereColumn('compare_at_price', '>', 'price')))
             ->when($request->boolean('new'), fn (Builder $query) => $query->where('is_new', true))
-            ->when($request->filled('min_price'), fn (Builder $query) => $query->whereHas('variants', fn (Builder $variant) => $variant->where('price', '>=', $request->string('min_price'))))
-            ->when($request->filled('max_price'), fn (Builder $query) => $query->whereHas('variants', fn (Builder $variant) => $variant->where('price', '<=', $request->string('max_price'))));
+            ->when($request->filled('min_price') || $request->filled('max_price'), function (Builder $query) use ($request): void {
+                $query->whereHas('variants', function (Builder $variant) use ($request): void {
+                    $variant->where('is_active', true)
+                        ->when($request->filled('min_price'), fn (Builder $variant) => $variant->where('price', '>=', $request->string('min_price')))
+                        ->when($request->filled('max_price'), fn (Builder $variant) => $variant->where('price', '<=', $request->string('max_price')));
+                });
+            });
 
         match ($request->string('sort')->value()) {
             'price_asc' => $products->orderBy('catalog_price'),
@@ -60,14 +67,24 @@ class ProductController extends Controller
     {
         abort_unless($product->is_active, 404);
 
+        $product->load([
+            'brand', 'category', 'images', 'skinTypes', 'concerns', 'ingredients',
+            'variants' => fn ($query) => $query->where('is_active', true),
+        ]);
+        $relations = ['brand', 'images', 'variants' => fn ($query) => $query->where('is_active', true)];
+
         return view('storefront.products.show', [
-            'product' => $product->load([
-                'brand', 'category', 'images', 'skinTypes', 'concerns', 'ingredients',
-                'variants' => fn ($query) => $query->where('is_active', true),
-            ]),
-            'relatedProducts' => Product::query()->where('is_active', true)->whereKeyNot($product->id)
+            'product' => $product,
+            'relatedProducts' => Product::query()->sellable()->whereKeyNot($product->id)
                 ->when($product->category_id, fn (Builder $query) => $query->where('category_id', $product->category_id))
-                ->with(['brand', 'images', 'variants' => fn ($query) => $query->where('is_active', true)])
+                ->with($relations)
+                ->limit(4)->get(),
+            'sameBrandProducts' => Product::query()->sellable()->whereKeyNot($product->id)
+                ->where('brand_id', $product->brand_id)->whereNotNull('brand_id')->with($relations)
+                ->limit(4)->get(),
+            'routineProducts' => Product::query()->sellable()->whereKeyNot($product->id)
+                ->whereHas('concerns', fn (Builder $query) => $query->whereKey($product->concerns->modelKeys()))
+                ->with($relations)
                 ->limit(4)->get(),
         ]);
     }

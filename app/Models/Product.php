@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Brick\Math\BigDecimal;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,6 +16,12 @@ class Product extends Model
     protected function casts(): array
     {
         return ['is_active' => 'boolean', 'is_featured' => 'boolean', 'is_new' => 'boolean'];
+    }
+
+    public function scopeSellable(Builder $query): Builder
+    {
+        return $query->where('is_active', true)
+            ->whereHas('variants', fn (Builder $variant) => $variant->where('is_active', true));
     }
 
     public function getRouteKeyName(): string
@@ -65,5 +73,18 @@ class Product extends Model
             'is_default' => true,
             'is_active' => true,
         ]);
+    }
+
+    public function catalogVariant(): ?ProductVariant
+    {
+        return $this->variants
+            ->where('is_active', true)
+            ->sort(fn (ProductVariant $left, ProductVariant $right) => BigDecimal::of($left->price)->compareTo(BigDecimal::of($right->price)))
+            ->first();
+    }
+
+    public function hasAvailableStock(): bool
+    {
+        return $this->variants->contains(fn (ProductVariant $variant) => $variant->is_active && $variant->stock_quantity > 0);
     }
 }

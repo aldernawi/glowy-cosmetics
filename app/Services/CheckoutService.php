@@ -42,7 +42,7 @@ class CheckoutService
             $resolved = [];
             foreach ($items as $item) {
                 $variant = ProductVariant::query()->with('product')->lockForUpdate()->findOrFail($item->product_variant_id);
-                if (! $variant->is_active || $variant->stock_quantity < $item->quantity) {
+                if (! $variant->is_active || ! $variant->product->is_active || $variant->stock_quantity < $item->quantity) {
                     throw new DomainException('Stock changed.');
                 } $line = BigDecimal::of($variant->price)->multipliedBy($item->quantity);
                 $subtotal = $subtotal->plus($line);

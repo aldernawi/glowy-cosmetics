@@ -11,7 +11,7 @@
                 @if($product->images->count() > 1)<div class="mt-4 grid grid-cols-5 gap-3">@foreach($product->images as $image)<button type="button" @click="image = @js($image->path)" class="aspect-square rounded-2xl border border-glowy-champagne bg-white p-2 focus:border-glowy-rose"><img src="{{ $image->path }}" alt="{{ $image->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" loading="lazy"></button>@endforeach</div>@endif
             </div>
 
-            <div class="self-start lg:sticky lg:top-6">
+            <div class="self-start lg:sticky lg:top-36">
                 @if($product->brand)<a href="{{ route('brands.show', $product->brand) }}" class="text-sm font-bold text-glowy-rose">{{ $product->brand->name_ar }}</a>@endif
                 <h1 class="mt-2 font-display text-3xl font-bold text-glowy-plum sm:text-5xl">{{ $product->name_ar }}</h1>
                 @if($product->name_en)<p class="mt-2 font-sans text-sm text-glowy-muted" dir="ltr">{{ $product->name_en }}</p>@endif
@@ -32,4 +32,6 @@
     @if($product->concerns->isNotEmpty() || $product->skinTypes->isNotEmpty())<section class="mx-auto max-w-7xl px-5 py-12 sm:px-8"><div class="flex flex-wrap gap-3">@foreach($product->concerns as $concern)<a href="{{ route('concerns.show', $concern) }}" class="rounded-full bg-glowy-blush px-4 py-2 text-sm font-bold text-glowy-rose">{{ $concern->name_ar }}</a>@endforeach @foreach($product->skinTypes as $skinType)<span class="rounded-full border border-glowy-champagne px-4 py-2 text-sm">مناسب للبشرة {{ $skinType->name_ar }}</span>@endforeach</div></section>@endif
 
     @if($relatedProducts->isNotEmpty())<section class="mx-auto max-w-7xl px-5 py-14 sm:px-8"><h2 class="font-display text-3xl font-bold text-glowy-plum">قد يعجبك أيضًا</h2><div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">@foreach($relatedProducts as $related)<x-storefront.product-card :product="$related" />@endforeach</div></section>@endif
+    @if($sameBrandProducts->isNotEmpty())<section class="bg-white py-14"><div class="mx-auto max-w-7xl px-5 sm:px-8"><h2 class="font-display text-3xl font-bold text-glowy-plum">من نفس الماركة</h2><div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">@foreach($sameBrandProducts as $sameBrandProduct)<x-storefront.product-card :product="$sameBrandProduct" />@endforeach</div></div></section>@endif
+    @if($routineProducts->isNotEmpty())<section class="mx-auto max-w-7xl px-5 py-14 sm:px-8"><p class="text-sm font-bold text-glowy-rose">اختيارات لنفس احتياج بشرتك</p><h2 class="mt-2 font-display text-3xl font-bold text-glowy-plum">يكمّل روتينك</h2><div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">@foreach($routineProducts as $routineProduct)<x-storefront.product-card :product="$routineProduct" />@endforeach</div></section>@endif
 </x-layouts.storefront>
