@@ -82,6 +82,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::delete('variants/{variant}', [ProductVariantController::class, 'destroy'])->name('variants.destroy');
     Route::post('products/{product}/images', [ProductImageController::class, 'store'])->name('products.images.store');
     Route::delete('images/{image}', [ProductImageController::class, 'destroy'])->name('images.destroy');
+    Route::patch('images/{image}/primary', [ProductImageController::class, 'makePrimary'])->name('images.primary');
     Route::get('stock/adjustments', [StockAdjustmentController::class, 'index'])->name('stock.adjustments.index');
     Route::post('stock/adjustments', [StockAdjustmentController::class, 'store'])->name('stock.adjustments.store');
     Route::get('stock/low', [InventoryController::class, 'lowStock'])->name('stock.low.index');

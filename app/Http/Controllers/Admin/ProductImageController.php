@@ -7,8 +7,8 @@ use App\Http\Requests\Admin\StoreProductImageRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
@@ -34,5 +34,15 @@ class ProductImageController extends Controller
         Storage::disk('public')->delete($path);
 
         return to_route('admin.products.index')->with('status', 'تم حذف صورة المنتج.');
+    }
+
+    public function makePrimary(ProductImage $image): RedirectResponse
+    {
+        DB::transaction(function () use ($image): void {
+            $image->product->images()->update(['is_primary' => false]);
+            $image->update(['is_primary' => true]);
+        });
+
+        return to_route('admin.products.index')->with('status', 'تم تعيين الصورة الأساسية.');
     }
 }

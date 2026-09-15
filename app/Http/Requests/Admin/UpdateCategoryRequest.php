@@ -8,7 +8,10 @@ use Illuminate\Validation\Rule;
 
 class UpdateCategoryRequest extends FormRequest
 {
-    public function authorize(): bool { return $this->user()?->can('admin.access') ?? false; }
+    public function authorize(): bool
+    {
+        return $this->user()?->can('admin.access') ?? false;
+    }
 
     public function rules(): array
     {
@@ -27,10 +30,18 @@ class UpdateCategoryRequest extends FormRequest
         return [function ($validator): void {
             $category = $this->route('category');
             $parentId = $this->integer('parent_id');
-            if (! $category instanceof Category || $parentId === 0) return;
-            $descendants = [$category->id]; $frontier = [$category->id];
-            while ($frontier !== []) { $frontier = Category::query()->whereIn('parent_id', $frontier)->pluck('id')->all(); $descendants = [...$descendants, ...$frontier]; }
-            if (in_array($parentId, $descendants, true)) $validator->errors()->add('parent_id', 'لا يمكن جعل التصنيف تابعًا لنفسه أو لأحد فروعه.');
+            if (! $category instanceof Category || $parentId === 0) {
+                return;
+            }
+            $descendants = [$category->id];
+            $frontier = [$category->id];
+            while ($frontier !== []) {
+                $frontier = Category::query()->whereIn('parent_id', $frontier)->pluck('id')->all();
+                $descendants = [...$descendants, ...$frontier];
+            }
+            if (in_array($parentId, $descendants, true)) {
+                $validator->errors()->add('parent_id', 'لا يمكن جعل التصنيف تابعًا لنفسه أو لأحد فروعه.');
+            }
         }];
     }
 }

@@ -31,6 +31,7 @@ class AdminUserController extends Controller
     {
         abort_if($request->user()->is($user) && $request->input('role') !== 'administrator', 422, 'لا يمكن إزالة صلاحيتك الإدارية.');
         $user->syncRoles([$request->string('role')->toString()]);
+
         return to_route('admin.users.index')->with('status', 'تم تحديث دور المستخدم.');
     }
 }
