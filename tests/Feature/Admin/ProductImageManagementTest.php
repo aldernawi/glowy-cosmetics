@@ -47,8 +47,10 @@ class ProductImageManagementTest extends TestCase
 
     public function test_primary_image_is_promoted_when_the_primary_image_is_deleted(): void
     {
-        Storage::fake('public'); $this->seed(RolesAndPermissionsSeeder::class);
-        $admin = User::factory()->create(); $admin->givePermissionTo('admin.access');
+        Storage::fake('public');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
         $product = Product::query()->create(['name_ar' => 'غسول', 'slug' => 'cleanser']);
         $primary = $product->images()->create(['path' => 'products/1/a.webp', 'is_primary' => true]);
         $other = $product->images()->create(['path' => 'products/1/b.webp', 'sort_order' => 1]);

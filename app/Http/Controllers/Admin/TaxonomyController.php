@@ -44,6 +44,36 @@ class TaxonomyController extends Controller
         return $this->store($request, Ingredient::class, 'ingredients');
     }
 
+    public function updateConcern(StoreTaxonomyRequest $request, Concern $concern): RedirectResponse
+    {
+        return $this->update($request, $concern, 'concerns');
+    }
+
+    public function updateSkinType(StoreTaxonomyRequest $request, SkinType $skinType): RedirectResponse
+    {
+        return $this->update($request, $skinType, 'skin-types');
+    }
+
+    public function updateIngredient(StoreTaxonomyRequest $request, Ingredient $ingredient): RedirectResponse
+    {
+        return $this->update($request, $ingredient, 'ingredients');
+    }
+
+    public function destroyConcern(Concern $concern): RedirectResponse
+    {
+        return $this->destroy($concern, 'concerns');
+    }
+
+    public function destroySkinType(SkinType $skinType): RedirectResponse
+    {
+        return $this->destroy($skinType, 'skin-types');
+    }
+
+    public function destroyIngredient(Ingredient $ingredient): RedirectResponse
+    {
+        return $this->destroy($ingredient, 'ingredients');
+    }
+
     /** @param class-string<Model> $model */
     private function index(string $model, string $label, string $route): View
     {
@@ -58,5 +88,19 @@ class TaxonomyController extends Controller
         $model::query()->create($validated + ['is_active' => $request->boolean('is_active')]);
 
         return to_route("admin.{$route}.index")->with('status', 'تمت الإضافة.');
+    }
+
+    private function update(StoreTaxonomyRequest $request, Model $item, string $route): RedirectResponse
+    {
+        $item->update($request->validated() + ['is_active' => $request->boolean('is_active')]);
+
+        return to_route("admin.{$route}.index");
+    }
+
+    private function destroy(Model $item, string $route): RedirectResponse
+    {
+        $item->delete();
+
+        return to_route("admin.{$route}.index");
     }
 }

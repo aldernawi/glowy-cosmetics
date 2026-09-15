@@ -69,10 +69,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     Route::get('concerns', [TaxonomyController::class, 'concerns'])->name('concerns.index');
     Route::post('concerns', [TaxonomyController::class, 'storeConcern'])->name('concerns.store');
+    Route::patch('concerns/{concern}', [TaxonomyController::class, 'updateConcern'])->name('concerns.update');
+    Route::delete('concerns/{concern}', [TaxonomyController::class, 'destroyConcern'])->name('concerns.destroy');
     Route::get('skin-types', [TaxonomyController::class, 'skinTypes'])->name('skin-types.index');
     Route::post('skin-types', [TaxonomyController::class, 'storeSkinType'])->name('skin-types.store');
+    Route::patch('skin-types/{skinType}', [TaxonomyController::class, 'updateSkinType'])->name('skin-types.update');
+    Route::delete('skin-types/{skinType}', [TaxonomyController::class, 'destroySkinType'])->name('skin-types.destroy');
     Route::get('ingredients', [TaxonomyController::class, 'ingredients'])->name('ingredients.index');
     Route::post('ingredients', [TaxonomyController::class, 'storeIngredient'])->name('ingredients.store');
+    Route::patch('ingredients/{ingredient}', [TaxonomyController::class, 'updateIngredient'])->name('ingredients.update');
+    Route::delete('ingredients/{ingredient}', [TaxonomyController::class, 'destroyIngredient'])->name('ingredients.destroy');
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
     Route::post('products', [ProductController::class, 'store'])->name('products.store');
     Route::patch('products/{product}', [ProductController::class, 'update'])->name('products.update');
