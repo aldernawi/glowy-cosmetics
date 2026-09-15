@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Category;
 use App\Services\CartService;
+use App\Services\HomepageService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
                 'headerCartCount' => $cart?->items->sum('quantity') ?? 0,
                 'headerCartSubtotal' => $cart ? $service->subtotal($cart) : '0.000',
                 'headerSunscreenCategory' => Category::query()->where('is_active', true)->where('name_ar', 'like', '%واقي الشمس%')->first(),
+                'storeContent' => app(HomepageService::class)->all(),
             ]);
         });
     }

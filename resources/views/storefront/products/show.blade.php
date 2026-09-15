@@ -1,14 +1,14 @@
-<x-layouts.storefront :title="$product->name_ar . ' | Glowy'">
+<x-layouts.storefront :title="$product->name_ar . ' | Glowy'" :description="$product->description ?: 'اكتشفي '.$product->name_ar.' من Glowy.'" :canonical="route('products.show', $product)" og-type="product" :og-image="$product->images->first()?->url" :structured-data="$structuredData">
     @php($variant = $product->variants->firstWhere('is_default', true) ?? $product->variants->first())
     @php($firstImage = $product->images->first())
     <section class="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <nav class="mb-8 text-sm text-glowy-muted" aria-label="مسار التنقل"><a href="{{ route('home') }}">الرئيسية</a> <span class="mx-2">/</span><a href="{{ route('products.index') }}">المنتجات</a><span class="mx-2">/</span><span>{{ $product->name_ar }}</span></nav>
-        <div class="grid gap-10 lg:grid-cols-2" x-data="{ image: @js($firstImage?->path) }">
+        <div class="grid gap-10 lg:grid-cols-2" x-data="{ image: @js($firstImage?->url) }">
             <div>
                 <div class="aspect-square overflow-hidden rounded-[2rem] bg-glowy-blush p-8">
-                    @if ($firstImage)<img :src="image" src="{{ $firstImage->path }}" alt="{{ $firstImage->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" fetchpriority="high">@else<span class="flex h-full items-center justify-center text-7xl text-glowy-rose">✦</span>@endif
+                    @if ($firstImage)<img :src="image" src="{{ $firstImage->url }}" alt="{{ $firstImage->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" fetchpriority="high" onerror="this.onerror=null;this.src='{{ asset('images/product-placeholder.svg') }}'">@else<span class="flex h-full items-center justify-center text-7xl text-glowy-rose">✦</span>@endif
                 </div>
-                @if($product->images->count() > 1)<div class="mt-4 grid grid-cols-5 gap-3">@foreach($product->images as $image)<button type="button" @click="image = @js($image->path)" class="aspect-square rounded-2xl border border-glowy-champagne bg-white p-2 focus:border-glowy-rose"><img src="{{ $image->path }}" alt="{{ $image->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" loading="lazy"></button>@endforeach</div>@endif
+                @if($product->images->count() > 1)<div class="mt-4 grid grid-cols-5 gap-3">@foreach($product->images as $image)<button type="button" @click="image = @js($image->url)" class="aspect-square rounded-2xl border border-glowy-champagne bg-white p-2 focus:border-glowy-rose"><img src="{{ $image->url }}" alt="{{ $image->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/product-placeholder.svg') }}'"></button>@endforeach</div>@endif
             </div>
 
             <div class="self-start lg:sticky lg:top-36">

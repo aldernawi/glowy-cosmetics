@@ -1,4 +1,4 @@
-<x-layouts.storefront title="منتجات العناية | Glowy">
+<x-layouts.storefront title="منتجات العناية | Glowy" description="تصفحي منتجات العناية بالبشرة والشعر والجسم المختارة من Glowy." :canonical="route('products.index')" :robots="request()->query() ? 'noindex,follow' : 'index,follow'">
     <section class="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>

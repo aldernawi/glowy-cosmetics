@@ -31,7 +31,7 @@
 - Customer directory, profiles, and order history; admin users and permission management.
 - Tests: authorization, validation, media rules, nested categories, low-stock queries, KPIs.
 
-## Phase 4 — Content, discoverability, reporting, and release QA
+## Phase 4 — Content, discoverability, reporting, and release QA ✅
 
 - Homepage CMS for hero, banners, featured collections, brands, concerns, product blocks, announcement bar, and contact/settings content.
 - Reports for sales, orders, products, brands, categories, customers, and stock; CSV exports.

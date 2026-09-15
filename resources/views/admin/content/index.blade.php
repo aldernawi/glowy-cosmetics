@@ -1,0 +1,23 @@
+<x-layouts.admin title="محتوى المتجر | Glowy">
+    <h1 class="text-3xl font-bold text-glowy-plum">محتوى الصفحة الرئيسية</h1>
+    <p class="mt-2 text-glowy-muted">تحكم مركزي في الرسالة، الأقسام المميزة، التواصل وبيانات الظهور في البحث.</p>
+    @if(session('status'))<p class="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm font-bold text-emerald-800">{{ session('status') }}</p>@endif
+    @if($errors->any())<div class="mt-5 rounded-2xl bg-rose-50 p-4 text-sm text-rose-800"><ul class="list-inside list-disc">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+    <form method="POST" action="{{ route('admin.content.update') }}" enctype="multipart/form-data" class="mt-8 grid gap-8">@csrf @method('PUT')
+        <section class="grid gap-4 rounded-3xl border border-glowy-champagne bg-white p-6 md:grid-cols-2"><h2 class="text-xl font-bold text-glowy-plum md:col-span-2">Hero والبنر الترويجي</h2>
+            <x-ui.input name="hero_title" label="عنوان Hero" :value="old('hero_title',$content['hero_title'])" required/><x-ui.input name="hero_cta_label" label="نص الزر" :value="old('hero_cta_label',$content['hero_cta_label'])" required/>
+            <label class="grid gap-2 text-sm font-bold md:col-span-2">الوصف<textarea name="hero_subtitle" class="rounded-xl border-glowy-champagne" rows="3" required>{{ old('hero_subtitle',$content['hero_subtitle']) }}</textarea></label>
+            <label class="grid gap-2 text-sm font-bold md:col-span-2">صورة Hero<input type="file" name="hero_image" accept="image/*" class="rounded-xl border border-glowy-champagne p-3 text-sm"><span class="font-normal text-glowy-muted">اتركيها فارغة للاحتفاظ بالصورة الحالية.</span></label>
+            <x-ui.input name="promo_title" label="عنوان البانر" :value="old('promo_title',$content['promo_title'])" required/><x-ui.input name="promo_cta_label" label="نص زر البانر" :value="old('promo_cta_label',$content['promo_cta_label'])" required/>
+            <label class="grid gap-2 text-sm font-bold md:col-span-2">وصف البانر<textarea name="promo_body" class="rounded-xl border-glowy-champagne" rows="3" required>{{ old('promo_body',$content['promo_body']) }}</textarea></label>
+        </section>
+        <section class="grid gap-4 rounded-3xl border border-glowy-champagne bg-white p-6 md:grid-cols-2"><div class="md:col-span-2"><h2 class="text-xl font-bold text-glowy-plum">الأقسام المختارة</h2><p class="mt-1 text-sm text-glowy-muted">عند عدم الاختيار تُستخدم علامات «مميز» و«وصل حديثًا» من الكتالوج.</p></div>
+            @foreach([['featured_category_ids','التصنيفات المميزة',$categories],['featured_brand_ids','الماركات المميزة',$brands],['featured_concern_ids','احتياجات البشرة',$concerns],['new_product_ids','منتجات وصل حديثًا',$products],['best_seller_ids','الأكثر مبيعًا',$products]] as [$name,$label,$options])
+                <label class="grid gap-2 text-sm font-bold"><span>{{ $label }}</span><select name="{{ $name }}[]" multiple class="min-h-36 rounded-xl border-glowy-champagne">@foreach($options as $option)<option value="{{ $option->id }}" @selected(in_array($option->id,old($name,$content[$name])))>{{ $option->name_ar }}</option>@endforeach</select></label>
+            @endforeach
+        </section>
+        <section class="grid gap-4 rounded-3xl border border-glowy-champagne bg-white p-6 md:grid-cols-2"><h2 class="text-xl font-bold text-glowy-plum md:col-span-2">الإعلان والتواصل</h2><x-ui.input name="announcement" label="شريط الإعلان" :value="old('announcement',$content['announcement'])"/><x-ui.input name="phone" label="الهاتف" :value="old('phone',$content['phone'])"/><x-ui.input name="whatsapp" label="واتساب بدون +" :value="old('whatsapp',$content['whatsapp'])" dir="ltr"/><x-ui.input name="email" label="البريد" :value="old('email',$content['email'])"/><x-ui.input name="address" label="العنوان" :value="old('address',$content['address'])"/><x-ui.input name="working_hours" label="ساعات العمل" :value="old('working_hours',$content['working_hours'])"/></section>
+        <section class="grid gap-4 rounded-3xl border border-glowy-champagne bg-white p-6 md:grid-cols-2"><h2 class="text-xl font-bold text-glowy-plum md:col-span-2">SEO الرئيسي</h2><x-ui.input name="meta_title" label="عنوان الصفحة" :value="old('meta_title',$content['meta_title'])"/><label class="grid gap-2 text-sm font-bold md:col-span-2">الوصف لمحركات البحث<textarea name="meta_description" class="rounded-xl border-glowy-champagne" rows="2">{{ old('meta_description',$content['meta_description']) }}</textarea></label></section>
+        <x-ui.button type="submit" class="w-fit">حفظ محتوى المتجر</x-ui.button>
+    </form>
+</x-layouts.admin>

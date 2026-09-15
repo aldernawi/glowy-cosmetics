@@ -6,16 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductImageRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\ProductImageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
-    public function store(StoreProductImageRequest $request, Product $product): RedirectResponse
+    public function store(StoreProductImageRequest $request, Product $product, ProductImageService $images): RedirectResponse
     {
-        $path = $request->file('image')->store("products/{$product->id}", 'public');
-        $product->images()->create(['path' => $path, 'alt_text' => $request->string('alt')->toString(), 'sort_order' => $product->images()->count(), 'is_primary' => ! $product->images()->exists()]);
+        $images->store($product, $request->file('image'), $request->string('alt')->toString());
 
         return to_route('admin.products.index')->with('status', 'تم رفع صورة المنتج.');
     }

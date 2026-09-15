@@ -5,7 +5,7 @@
         <span class="pointer-events-none absolute -start-1/2 top-0 z-10 h-full w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/45 to-transparent opacity-0 transition-all duration-700 group-hover:start-[120%] group-hover:opacity-100" aria-hidden="true"></span>
         @if ($product->is_new)<span class="absolute start-3 top-3 z-10 rounded-full bg-white px-3 py-1 text-xs font-bold text-glowy-rose-deep">وصل حديثًا</span>@endif
         @if ($product->images->first())
-            <img src="{{ $product->images->first()->path }}" alt="{{ $product->images->first()->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain transition duration-700 group-hover:-rotate-1 group-hover:scale-110" loading="lazy" decoding="async">
+            <img src="{{ $product->images->first()->url }}" alt="{{ $product->images->first()->alt_text ?: $product->name_ar }}" class="h-full w-full object-contain transition duration-700 group-hover:-rotate-1 group-hover:scale-110" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ asset('images/product-placeholder.svg') }}'">
         @else
             <span class="flex h-full items-center justify-center text-5xl text-glowy-rose" aria-hidden="true">✦</span>
         @endif

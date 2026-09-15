@@ -27,6 +27,7 @@ class ProductImageManagementTest extends TestCase
             ->assertRedirect(route('admin.products.index'));
 
         $path = $product->images()->sole()->path;
+        $this->assertStringEndsWith('.webp', $path);
         Storage::disk('public')->assertExists($path);
     }
 

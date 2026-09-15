@@ -1,4 +1,4 @@
-<x-layouts.storefront title="Glowy | عناية تستحقها بشرتك">
+<x-layouts.storefront :title="$content['meta_title']" :description="$content['meta_description']" :canonical="route('home')">
     <section class="hero-editorial relative isolate overflow-hidden bg-glowy-blush" data-parallax-scene>
         <div class="hero-editorial__halo absolute -end-24 top-10 h-72 w-72 rounded-full bg-white/60 blur-3xl" aria-hidden="true"></div>
         <div class="absolute -start-24 bottom-0 h-80 w-80 rounded-full bg-glowy-champagne/65 blur-3xl" aria-hidden="true"></div>
@@ -10,15 +10,14 @@
                     اختيارات موثوقة لبشرتك
                 </p>
                 <h1 class="font-display text-4xl font-bold leading-[1.25] text-glowy-plum sm:text-6xl lg:text-7xl">
-                    كل بشرة تستحق
                     <span class="relative block w-fit text-glowy-rose">
-                        لحظة Glowy
+                        {{ $content['hero_title'] }}
                         <svg class="absolute -bottom-3 start-0 w-full text-glowy-rose/45" viewBox="0 0 310 18" fill="none" aria-hidden="true"><path d="M5 12C73 3 183 3 305 9" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>
                     </span>
                 </h1>
-                <p class="mt-8 max-w-xl text-lg leading-9 text-glowy-muted">منتجات عناية أصلية ومختارة بعناية، لتبني روتينًا بسيطًا يناسب بشرتك ويمنحها وهجها الطبيعي.</p>
+                <p class="mt-8 max-w-xl text-lg leading-9 text-glowy-muted">{{ $content['hero_subtitle'] }}</p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('products.index') }}" class="glowy-button glowy-button--primary">تسوّقي الآن <span aria-hidden="true">←</span></a>
+                    <a href="{{ route('products.index') }}" class="glowy-button glowy-button--primary">{{ $content['hero_cta_label'] }} <span aria-hidden="true">←</span></a>
                     <a href="#routine" class="glowy-button glowy-button--secondary">اكتشفي روتينك</a>
                 </div>
                 <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3 text-sm font-bold text-glowy-plum/75">
@@ -37,7 +36,7 @@
                     <span class="text-sm font-bold">لمسة ناعمة، نتيجة أجمل</span>
                 </div>
                 <div class="hero-image-shell relative overflow-hidden rounded-[2.5rem_2.5rem_6rem_2.5rem] border-[6px] border-white bg-glowy-champagne shadow-[0_28px_90px_rgba(58,47,51,.16)] sm:rounded-[4rem_4rem_9rem_4rem]">
-                    <img src="{{ asset('images/editorial/glowy-hero.webp') }}"
+                    <img src="{{ str_starts_with($content['hero_image_path'], 'homepage/') ? Storage::disk('public')->url($content['hero_image_path']) : asset($content['hero_image_path']) }}"
                          alt="مجموعة عناية بالبشرة بألوان Glowy الهادئة"
                          class="hero-image h-[30rem] w-full object-cover object-center sm:h-[38rem]"
                          width="1536" height="1024" fetchpriority="high" decoding="async">
@@ -131,9 +130,9 @@
             <span class="absolute end-16 top-10 text-4xl text-glowy-champagne/70" data-parallax data-parallax-depth=".8" aria-hidden="true">✦</span>
             <div class="relative z-10 p-8 sm:p-12 lg:p-16">
                 <p class="text-sm font-bold text-glowy-champagne">اختيار الأسبوع</p>
-                <h2 class="mt-3 max-w-lg font-display text-3xl font-bold leading-tight sm:text-4xl">روتينك يبدأ بخطوة صحيحة</h2>
-                <p class="mt-5 max-w-xl leading-8 text-white/75">ابدئي بغسول لطيف، ثم عالجي احتياج بشرتك، اختمي بالترطيب ولا تنسي الحماية من الشمس صباحًا.</p>
-                <a href="{{ route('products.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-glowy-plum transition hover:-translate-y-1 hover:bg-glowy-blush">كوّني روتينك <span aria-hidden="true">←</span></a>
+                <h2 class="mt-3 max-w-lg font-display text-3xl font-bold leading-tight sm:text-4xl">{{ $content['promo_title'] }}</h2>
+                <p class="mt-5 max-w-xl leading-8 text-white/75">{{ $content['promo_body'] }}</p>
+                <a href="{{ route('products.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-glowy-plum transition hover:-translate-y-1 hover:bg-glowy-blush">{{ $content['promo_cta_label'] }} <span aria-hidden="true">←</span></a>
             </div>
             <div class="relative min-h-72 overflow-hidden bg-glowy-champagne/10">
                 <div class="absolute inset-8 rounded-[45%_55%_42%_58%/56%_44%_56%_44%] border border-white/15" aria-hidden="true"></div>

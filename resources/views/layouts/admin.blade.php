@@ -26,7 +26,8 @@
                     <a href="{{ route('admin.stock.movements.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">حركات المخزون</a>
                     <a href="{{ route('admin.delivery.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">التوصيل</a>
                     <a href="{{ route('admin.users.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المستخدمون والصلاحيات</a>
-                    <span class="rounded-xl px-4 py-3 text-white/55">الإعدادات — قريبًا</span>
+                    <a href="{{ route('admin.content.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">المحتوى والإعدادات</a>
+                    <a href="{{ route('admin.reports.index') }}" class="rounded-xl px-4 py-3 transition hover:bg-white/10">التقارير</a>
                 </nav>
             </aside>
             <div class="min-w-0">

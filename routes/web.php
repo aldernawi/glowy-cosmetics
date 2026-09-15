@@ -6,11 +6,13 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliverySettingController;
+use App\Http\Controllers\Admin\HomepageContentController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\ProductVariantController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\StockAdjustmentController;
 use App\Http\Controllers\Admin\TaxonomyController;
 use App\Http\Controllers\CustomerDashboardController;
@@ -23,6 +25,7 @@ use App\Http\Controllers\Storefront\ConcernController as StorefrontConcernContro
 use App\Http\Controllers\Storefront\CustomerOrderController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\ProductController as StorefrontProductController;
+use App\Http\Controllers\Storefront\SeoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
@@ -38,6 +41,8 @@ Route::get('/products', [StorefrontProductController::class, 'index'])->name('pr
 Route::get('/products/{product}', [StorefrontProductController::class, 'show'])->name('products.show');
 Route::get('/brands/{brand}', [StorefrontBrandController::class, 'show'])->name('brands.show');
 Route::get('/concerns/{concern}', [StorefrontConcernController::class, 'show'])->name('concerns.show');
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('seo.sitemap');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('seo.robots');
 
 Route::get('/dashboard', CustomerDashboardController::class)
     ->middleware(['auth', 'verified'])
@@ -63,6 +68,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::get('content', [HomepageContentController::class, 'index'])->name('content.index');
+    Route::put('content', [HomepageContentController::class, 'update'])->name('content.update');
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::patch('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');

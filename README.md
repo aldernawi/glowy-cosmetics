@@ -43,4 +43,13 @@ php artisan config:cache
 php artisan view:cache
 ```
 
-مفاتيح Google Maps وGoogle Routes لا تُضاف إلا عند مرحلة التوصيل، وتبقى في `.env` فقط.
+مفاتيح Google Maps وGoogle Routes تبقى في `.env` فقط، مع تقييد مفتاح المتصفح بالنطاقات المسموحة ومفتاح Routes على الخادم.
+
+## الإدارة والإطلاق
+
+- محتوى الصفحة الرئيسية وبيانات التواصل وSEO: `/admin/content`
+- تقارير التشغيل وتصدير CSV: `/admin/reports`
+- خريطة الموقع: `/sitemap.xml`
+- تعليمات محركات البحث: `/robots.txt`
+
+صور المنتجات وصورة Hero الجديدة تُحوّل إلى WebP عند الرفع. تأكد في الإنتاج من تفعيل امتداد GD وربط `storage/app/public` عبر `php artisan storage:link`.

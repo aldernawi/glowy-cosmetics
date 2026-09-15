@@ -75,6 +75,22 @@ class ProductController extends Controller
 
         return view('storefront.products.show', [
             'product' => $product,
+            'structuredData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'Product',
+                'name' => $product->name_ar,
+                'description' => $product->description,
+                'sku' => $product->variants->first()?->sku,
+                'brand' => $product->brand ? ['@type' => 'Brand', 'name' => $product->brand->name_ar] : null,
+                'image' => $product->images->pluck('url')->all(),
+                'offers' => $product->variants->map(fn ($variant) => [
+                    '@type' => 'Offer',
+                    'url' => route('products.show', $product),
+                    'priceCurrency' => 'LYD',
+                    'price' => $variant->price,
+                    'availability' => $variant->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                ])->all(),
+            ],
             'relatedProducts' => Product::query()->sellable()->whereKeyNot($product->id)
                 ->when($product->category_id, fn (Builder $query) => $query->where('category_id', $product->category_id))
                 ->with($relations)
