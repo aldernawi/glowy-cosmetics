@@ -60,6 +60,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'permission:admin.ac
     Route::post('brands', [BrandController::class, 'store'])->name('brands.store');
     Route::get('users', [AdminUserController::class, 'index'])->name('users.index');
     Route::post('users', [AdminUserController::class, 'store'])->name('users.store');
+    Route::patch('users/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
     Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');

@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProductImageController extends Controller
 {
@@ -21,8 +22,16 @@ class ProductImageController extends Controller
 
     public function destroy(ProductImage $image): RedirectResponse
     {
-        Storage::disk('public')->delete($image->path);
-        $image->delete();
+        $path = $image->path;
+        DB::transaction(function () use ($image): void {
+            $product = $image->product;
+            $wasPrimary = $image->is_primary;
+            $image->delete();
+            if ($wasPrimary) {
+                $product->images()->orderBy('sort_order')->first()?->update(['is_primary' => true]);
+            }
+        });
+        Storage::disk('public')->delete($path);
 
         return to_route('admin.products.index')->with('status', 'تم حذف صورة المنتج.');
     }
