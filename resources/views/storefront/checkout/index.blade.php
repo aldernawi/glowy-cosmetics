@@ -2,7 +2,7 @@
     @php($mapReady = filled($origin?->store_latitude) && filled($origin?->store_longitude))
     <section class="mx-auto max-w-6xl px-5 py-10 sm:px-8">
         <div class="max-w-2xl"><p class="section-eyebrow">خطوة أخيرة نحو روتينك</p><h1 class="section-title">إتمام الطلب</h1><p class="mt-2 text-sm leading-7 text-glowy-muted">الدفع عند الاستلام فقط. رسوم التوصيل تُحسب من مسار القيادة الفعلي بعد تأكيد موقعك.</p></div>
-        @error('checkout')<p class="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800" role="alert">{{ $message }}</p>@enderror
+        @if($errors->any())<div class="mt-5 rounded-2xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800" role="alert"><ul class="grid gap-1">@foreach(array_unique($errors->all()) as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
         @if (! $mapReady)<div class="mt-6 rounded-3xl border border-amber-200 bg-amber-50 p-5 text-sm leading-7 text-amber-900" role="alert"><strong>التوصيل غير جاهز مؤقتًا.</strong> لا يمكن حساب الرسوم أو تأكيد الطلب حتى يكتمل إعداد موقع المتجر.</div>@endif
         <form id="checkout-form" method="POST" action="{{ route('checkout.store') }}" class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">@csrf
             <div class="space-y-6 rounded-[2rem] border border-glowy-champagne/80 bg-white p-5 sm:p-7">

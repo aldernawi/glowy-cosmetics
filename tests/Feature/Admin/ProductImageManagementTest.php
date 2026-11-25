@@ -91,4 +91,23 @@ class ProductImageManagementTest extends TestCase
         $this->assertSame(1, $first->fresh()->sort_order);
         $this->assertTrue($first->fresh()->is_primary);
     }
+
+    public function test_a_file_that_only_pretends_to_be_an_image_is_rejected(): void
+    {
+        Storage::fake('public');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+        $product = Product::query()->create(['name_ar' => 'كريم', 'slug' => 'fake-image']);
+
+        // File::mimeType() is bypassed by UploadedFile::fake(), so a real temporary file is used.
+        $path = tempnam(sys_get_temp_dir(), 'glowy');
+        file_put_contents($path, '<html><script>alert(1)</script></html>');
+
+        $this->actingAs($administrator)->post(route('admin.products.images.store', $product), ['images' => [new UploadedFile($path, 'photo.jpg', 'image/jpeg', null, true)]])
+            ->assertSessionHasErrors('images.0');
+
+        $this->assertDatabaseCount('product_images', 0);
+        @unlink($path);
+    }
 }

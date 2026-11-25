@@ -176,6 +176,7 @@ if (mapElement?.dataset.originLatitude && mapElement.dataset.originLongitude) {
     const quoteButton = document.querySelector('#quote-button');
     const confirmOrder = document.querySelector('#confirm-button');
     let marker;
+    let suggestedAddress = '';
 
     const invalidateConfirmation = () => {
         locationConfirmed.value = '0';
@@ -197,12 +198,20 @@ if (mapElement?.dataset.originLatitude && mapElement.dataset.originLongitude) {
                 setLocation(position.lat, position.lng);
             });
         }
-        if (details.placeId !== undefined) placeId.value = details.placeId || '';
-        if (details.address && address && !address.value) address.value = details.address;
+        placeId.value = details.placeId || '';
+        if (address && (!address.value || address.value === suggestedAddress)) {
+            suggestedAddress = details.address || '';
+            address.value = suggestedAddress;
+        }
         invalidateConfirmation();
         confirmLocation.disabled = false;
         status.textContent = 'تم اختيار الموقع. اضغطي «تأكيد موقع التسليم» قبل حساب الرسوم.';
     };
+
+    if (latitude.value && longitude.value) {
+        setLocation(Number(latitude.value), Number(longitude.value), { placeId: placeId.value });
+        moveMapTo(map, latitude.value, longitude.value);
+    }
 
     map.on('click', (event) => setLocation(event.lngLat.lat, event.lngLat.lng));
     map.on('error', () => { status.textContent = 'تعذر تحميل الخريطة الآن. تحققي من اتصال الإنترنت ثم أعيدي المحاولة.'; });
@@ -347,10 +356,12 @@ document.querySelectorAll('[data-ajax-cart-form]').forEach((form) => {
                 },
                 body: new FormData(form),
             });
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
             if (!response.ok) throw new Error(data.message || 'تعذر إضافة المنتج إلى السلة.');
 
             document.querySelectorAll('[data-cart-count]').forEach((count) => { count.textContent = data.cart_count; });
+            const drawer = document.querySelector('[data-cart-drawer]');
+            if (drawer && data.drawer_html) drawer.innerHTML = data.drawer_html;
             showCartFeedback(data.message);
         } catch (error) {
             showCartFeedback(error.message || 'تعذر إضافة المنتج إلى السلة.', true);
@@ -377,11 +388,11 @@ document.querySelector('#quote-button')?.addEventListener('click', async () => {
     button.textContent = 'جارٍ الحساب…';
     try {
         const response = await fetch('/checkout/quote', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, Accept: 'application/json' }, body: JSON.stringify({ latitude, longitude }) });
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.message || 'تعذر حساب رسوم التوصيل لهذا الموقع.');
         card.textContent = `تم تأكيد الموقع: ${data.distance_km} كم · حوالي ${data.duration_minutes} دقيقة · رسوم التوصيل ${data.delivery_fee} د.ل`;
         document.querySelector('#checkout-delivery-fee').textContent = `${data.delivery_fee} د.ل`;
-        const subtotal = Number(document.querySelector('#checkout-subtotal').textContent.replace(/[^0-9.]/g, ''));
+        const subtotal = Number.parseFloat(document.querySelector('#checkout-subtotal').textContent);
         document.querySelector('#checkout-total').textContent = `${(subtotal + Number(data.delivery_fee)).toFixed(3)} د.ل`;
         confirmOrder.disabled = false;
     } catch (error) {

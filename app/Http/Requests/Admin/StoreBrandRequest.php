@@ -21,7 +21,7 @@ class StoreBrandRequest extends FormRequest
             'slug' => ['required', 'string', 'max:255', 'alpha_dash', Rule::unique('brands', 'slug')],
             'description' => ['nullable', 'string'],
             'website' => ['nullable', 'url', 'max:255'],
-            'logo' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
+            'logo' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
             'is_active' => ['required', 'boolean'],
             'is_featured' => ['sometimes', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

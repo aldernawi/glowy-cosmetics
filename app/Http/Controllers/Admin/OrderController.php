@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Http\Controllers\Admin\Concerns\ReadsDateFilters;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\OrderService;
@@ -14,6 +15,8 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    use ReadsDateFilters;
+
     public function index(Request $request): View
     {
         $orders = Order::query()->latest();
@@ -27,12 +30,8 @@ class OrderController extends Controller
         if ($request->filled('q')) {
             $orders->where(fn ($query) => $query->where('number', 'like', '%'.$request->string('q').'%')->orWhere('customer_name', 'like', '%'.$request->string('q').'%')->orWhere('phone', 'like', '%'.$request->string('q').'%'));
         }
-        if ($request->filled('from')) {
-            $orders->whereDate('created_at', '>=', $request->date('from'));
-        }
-        if ($request->filled('to')) {
-            $orders->whereDate('created_at', '<=', $request->date('to'));
-        }
+        $orders->when($this->dateFilter($request, 'from'), fn ($query, string $from) => $query->whereDate('created_at', '>=', $from))
+            ->when($this->dateFilter($request, 'to'), fn ($query, string $to) => $query->whereDate('created_at', '<=', $to));
 
         return view('admin.orders.index', ['orders' => $orders->paginate(25)->withQueryString(), 'statuses' => OrderStatus::cases()]);
     }
@@ -59,10 +58,14 @@ class OrderController extends Controller
         return to_route('admin.orders.index')->with('status', 'تم تحديث حالة الطلب.');
     }
 
-    public function updatePayment(Request $request, Order $order): RedirectResponse
+    public function updatePayment(Request $request, Order $order, OrderService $orders): RedirectResponse
     {
         $request->validate(['payment_status' => ['required', 'in:unpaid,paid']]);
-        $order->update(['payment_status' => PaymentStatus::from($request->string('payment_status')->toString())]);
+        try {
+            $orders->updatePayment($order, PaymentStatus::from($request->string('payment_status')->toString()));
+        } catch (DomainException) {
+            return back()->withErrors(['payment_status' => 'لا يمكن تعليم طلب ملغي أو مرتجع كمدفوع.']);
+        }
 
         return to_route('admin.orders.index')->with('status', 'تم تحديث حالة الدفع.');
     }

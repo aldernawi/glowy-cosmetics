@@ -22,7 +22,7 @@ class UpdateHomepageContentRequest extends FormRequest
                     $fail('رابط زر Hero يجب أن يكون رابطًا كاملاً أو مسارًا يبدأ بـ /.');
                 }
             }],
-            'hero_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
+            'hero_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
             'announcement' => ['nullable', 'string', 'max:180'],
             'promo_title' => ['sometimes', 'required', 'string', 'max:120'],
             'promo_body' => ['sometimes', 'required', 'string', 'max:500'],

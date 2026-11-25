@@ -31,7 +31,7 @@ class ReportService
             'customers_count' => User::query()->whereHas('orders')->count(),
             'products_count' => Product::query()->count(),
             'low_stock_count' => ProductVariant::query()->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count(),
-            'top_products' => DB::table('order_items')->select('product_name', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(subtotal) as revenue'))->groupBy('product_name')->orderByDesc('quantity')->limit(8)->get(),
+            'top_products' => DB::table('order_items')->joinSub($this->filteredOrders(Order::query()->where('status', OrderStatus::Delivered->value), $filters)->select('id'), 'sold_orders', 'sold_orders.id', '=', 'order_items.order_id')->select('product_name', DB::raw('SUM(quantity) as quantity'), DB::raw('SUM(subtotal) as revenue'))->groupBy('product_name')->orderByDesc('quantity')->limit(8)->get(),
         ];
     }
 

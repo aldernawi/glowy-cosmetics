@@ -33,9 +33,12 @@ class CartItemController extends Controller
         }
 
         if ($request->expectsJson()) {
+            $cart->load('items.productVariant.product.images');
+
             return response()->json([
                 'message' => 'تمت إضافة المنتج إلى سلتك.',
-                'cart_count' => $cart->items()->sum('quantity'),
+                'cart_count' => (int) $cart->items->sum('quantity'),
+                'drawer_html' => view('storefront.partials.cart-drawer', ['cart' => $cart, 'subtotal' => $carts->subtotal($cart)])->render(),
             ]);
         }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AdminLandingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,15 +23,19 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request, AdminLandingService $landing): RedirectResponse
     {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        $destination = $request->user()->canAny(['admin.access', 'admin.dashboard.view'])
-            ? route('admin.dashboard', absolute: false)
-            : route('dashboard', absolute: false);
+        $landingRoute = $landing->routeFor($request->user());
+        $destination = route($landingRoute ?? 'dashboard', absolute: false);
+
+        // Staff without the overview permission would be sent back to a forbidden page.
+        if ($landingRoute !== 'admin.dashboard' && $request->session()->get('url.intended') === route('admin.dashboard')) {
+            $request->session()->forget('url.intended');
+        }
 
         return redirect()->intended($destination);
     }

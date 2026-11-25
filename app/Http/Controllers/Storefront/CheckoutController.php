@@ -21,9 +21,13 @@ class CheckoutController extends Controller
 {
     private const OUT_OF_RANGE_MESSAGE = 'موقعك خارج نطاق التوصيل الحالي. نأسف لذلك، ويسعدنا تواصلك معنا لنساعدك.';
 
-    public function __invoke(Request $request, CartService $carts): View
+    public function __invoke(Request $request, CartService $carts): View|RedirectResponse
     {
-        $cart = $carts->resolve($request)->load('items.productVariant.product');
+        $cart = $carts->current($request)->loadMissing('items.productVariant.product');
+
+        if ($cart->items->isEmpty()) {
+            return to_route('cart.index');
+        }
 
         return view('storefront.checkout.index', [
             'cart' => $cart,
@@ -34,13 +38,17 @@ class CheckoutController extends Controller
 
     public function store(StoreCheckoutRequest $request, CartService $carts, DeliveryService $delivery, CheckoutService $checkout): RedirectResponse
     {
+        if ($carts->current($request)->items->isEmpty()) {
+            return to_route('cart.index');
+        }
+
         try {
             $quote = $delivery->quote($request->string('latitude')->toString(), $request->string('longitude')->toString());
             $order = $checkout->create($carts->resolve($request), $request->user(), $quote, ['customer_name' => $request->string('customer_name')->toString(), 'phone' => $request->string('phone')->toString(), 'secondary_phone' => $request->string('secondary_phone')->toString(), 'city_region' => $request->string('city_region')->toString(), 'address' => $request->string('address')->toString(), 'landmark' => $request->string('landmark')->toString(), 'place_id' => $request->string('place_id')->toString(), 'notes' => $request->string('notes')->toString(), 'latitude' => $request->string('latitude')->toString(), 'longitude' => $request->string('longitude')->toString()]);
         } catch (OutOfDeliveryRangeException) {
-            return back()->withErrors(['checkout' => self::OUT_OF_RANGE_MESSAGE]);
+            return back()->withInput()->withErrors(['checkout' => self::OUT_OF_RANGE_MESSAGE]);
         } catch (DomainException|RuntimeException) {
-            return back()->withErrors(['checkout' => 'تعذر تأكيد الطلب. يرجى تحديث موقع التوصيل أو السلة ثم المحاولة.']);
+            return back()->withInput()->withErrors(['checkout' => 'تعذر تأكيد الطلب. يرجى تحديث موقع التوصيل أو السلة ثم المحاولة.']);
         }
 
         $request->session()->put('last_order_number', $order->number);

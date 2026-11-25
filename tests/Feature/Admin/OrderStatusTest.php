@@ -67,4 +67,19 @@ class OrderStatusTest extends TestCase
             ->assertSee('قيد الانتظار ← تم التأكيد')
             ->assertSee('مسؤولة الطلبات ·');
     }
+
+    public function test_a_cancelled_or_returned_order_cannot_be_marked_as_paid(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+
+        foreach (['cancelled', 'returned', 'delivered'] as $status) {
+            $order = Order::query()->create(['number' => 'GLW-PAY-'.$status, 'status' => $status, 'customer_name' => 'عميلة', 'phone' => '09', 'delivery_latitude' => '1.0000000', 'delivery_longitude' => '1.0000000', 'delivery_distance_km' => '1.000', 'delivery_fee' => '1.000', 'store_latitude_snapshot' => '1.0000000', 'store_longitude_snapshot' => '1.0000000', 'subtotal' => '1.000', 'total' => '2.000']);
+            $response = $this->actingAs($administrator)->patch(route('admin.orders.payment.update', $order), ['payment_status' => 'paid']);
+
+            $status === 'delivered' ? $response->assertSessionHasNoErrors() : $response->assertSessionHasErrors('payment_status');
+            $this->assertSame($status === 'delivered' ? 'paid' : 'unpaid', $order->fresh()->payment_status->value);
+        }
+    }
 }

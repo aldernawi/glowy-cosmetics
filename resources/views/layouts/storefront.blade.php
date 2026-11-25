@@ -59,12 +59,7 @@
             <button class="absolute inset-0 bg-glowy-plum/45" @click="cartOpen = false" aria-label="إغلاق السلة"></button>
             <aside x-show="cartOpen" x-transition:enter="transition duration-300" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" class="absolute inset-y-0 end-0 flex w-full max-w-md flex-col bg-glowy-ivory p-6 shadow-2xl">
                 <div class="flex items-center justify-between"><h2 class="font-display text-2xl font-bold">سلتك</h2><button type="button" @click="cartOpen = false" class="rounded-full p-2 text-xl" aria-label="إغلاق">×</button></div>
-                <div class="mt-6 flex-1 space-y-4 overflow-y-auto">
-                    @forelse($headerCart?->items ?? [] as $item)
-                        <div class="flex gap-3 rounded-2xl bg-white p-3"><div class="h-16 w-16 shrink-0 rounded-xl bg-glowy-blush p-1">@if($item->productVariant->product->images->first())<img src="{{ $item->productVariant->product->images->first()->url }}" alt="" class="h-full w-full object-contain" onerror="this.onerror=null;this.src='{{ asset('images/product-placeholder.svg') }}'">@else<span class="flex h-full items-center justify-center text-glowy-rose">✦</span>@endif</div><div class="min-w-0"><p class="truncate font-bold">{{ $item->productVariant->product->name_ar }}</p><p class="text-sm text-glowy-muted">الكمية: {{ $item->quantity }}</p><p class="text-sm font-bold text-glowy-rose">{{ $item->productVariant->price }} د.ل</p></div></div>
-                    @empty<div class="rounded-3xl bg-glowy-blush p-8 text-center"><span class="text-4xl text-glowy-rose">✦</span><p class="mt-4 font-bold">سلتك تنتظر اختياراتك</p></div>@endforelse
-                </div>
-                <div class="border-t border-glowy-champagne pt-5"><div class="flex justify-between"><span>المجموع الفرعي</span><strong>{{ $headerCartSubtotal }} د.ل</strong></div><a href="{{ route('cart.index') }}" class="mt-4 flex min-h-12 items-center justify-center rounded-full bg-glowy-rose font-bold text-white">عرض السلة</a></div>
+                <div class="contents" data-cart-drawer>@include('storefront.partials.cart-drawer', ['cart' => $headerCart, 'subtotal' => $headerCartSubtotal])</div>
             </aside>
         </div>
         <div id="cart-feedback" class="pointer-events-none fixed inset-x-4 bottom-5 z-[60] mx-auto hidden max-w-sm rounded-2xl px-5 py-4 text-center text-sm font-bold shadow-lg sm:inset-x-auto sm:start-5" role="status" aria-live="polite"></div>

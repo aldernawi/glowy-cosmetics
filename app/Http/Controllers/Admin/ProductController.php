@@ -49,7 +49,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request, ProductService $products): RedirectResponse
     {
-        $product = $products->createWithDefaultVariant($request->validated(), $request->file('images', []));
+        $product = $products->createWithDefaultVariant($request->validated(), $request->file('images', []), $request->user());
 
         return to_route('admin.products.edit', $product)->with('status', 'تمت إضافة المنتج والمتغير الافتراضي.');
     }
@@ -64,9 +64,9 @@ class ProductController extends Controller
     public function destroy(Product $product, MediaCleanupService $media, ProductService $products): RedirectResponse
     {
         $paths = $products->deleteOrArchive($product);
-        $paths->each(fn (string $path) => $media->deleteProductImageIfUnreferenced($path));
+        $paths?->each(fn (string $path) => $media->deleteProductImageIfUnreferenced($path));
 
-        return to_route('admin.products.index')->with('status', $paths->isEmpty() ? 'تمت أرشفة المنتج للحفاظ على سجل الطلبات.' : 'تم حذف المنتج.');
+        return to_route('admin.products.index')->with('status', $paths === null ? 'تمت أرشفة المنتج للحفاظ على سجل الطلبات.' : 'تم حذف المنتج.');
     }
 
     /** @param array<string, mixed> $extra */

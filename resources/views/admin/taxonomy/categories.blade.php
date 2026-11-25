@@ -1,6 +1,7 @@
 <x-layouts.admin title="التصنيفات | Glowy">
     <h1 class="text-3xl font-bold text-glowy-plum">التصنيفات</h1>
     @if(session('status'))<p class="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm font-bold text-emerald-800">{{ session('status') }}</p>@endif
+    @if ($errors->any())<div class="mt-5 rounded-2xl bg-red-50 p-4 text-sm font-bold text-red-800" role="alert"><ul class="grid gap-1">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <form class="mt-8 grid gap-4 rounded-3xl border border-glowy-champagne bg-white p-6 md:grid-cols-3" method="POST" action="{{ route('admin.categories.store') }}" enctype="multipart/form-data">@csrf
         <x-ui.input name="name_ar" label="الاسم بالعربية" required/><x-ui.input name="name_en" label="الاسم بالإنجليزية" dir="ltr"/><x-ui.input name="slug" label="الرابط" dir="ltr" required/>
         <label class="grid gap-2 text-sm font-bold">التصنيف الأب<select name="parent_id" class="min-h-11 rounded-xl border-glowy-champagne"><option value="">رئيسي</option>@foreach($categories as $category)<option value="{{ $category->id }}">{{ $category->name_ar }}</option>@endforeach</select></label>

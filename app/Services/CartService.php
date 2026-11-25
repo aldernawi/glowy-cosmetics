@@ -10,6 +10,7 @@ use App\Models\User;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
 use DomainException;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +86,12 @@ class CartService
         return is_string($token) && $token !== ''
             ? Cart::query()->where('guest_token_hash', hash('sha256', $token))->first()
             : null;
+    }
+
+    /** The customer's cart, or an empty unsaved one so that browsing never writes to the database. */
+    public function current(Request $request): Cart
+    {
+        return $this->find($request) ?? (new Cart)->setRelation('items', new Collection);
     }
 
     public function resolve(Request $request): Cart

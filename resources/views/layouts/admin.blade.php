@@ -20,7 +20,7 @@
     <div x-cloak x-show="sidebarOpen" class="fixed inset-0 z-40 bg-glowy-plum/45 lg:hidden" @click="sidebarOpen = false"></div>
     <div class="min-h-screen lg:grid lg:grid-cols-[18rem_minmax(0,1fr)]">
         <aside class="fixed inset-y-0 right-0 z-50 flex w-[18rem] flex-col bg-glowy-plum p-4 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shadow-none" :class="sidebarOpen ? 'translate-x-0' : 'translate-x-full'">
-            <div class="flex items-center justify-between gap-3"><a href="{{ route('admin.dashboard') }}" class="rounded-2xl bg-white p-3"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="w-28"></a><button type="button" class="rounded-xl p-2 text-xl lg:hidden" @click="sidebarOpen = false" aria-label="إغلاق القائمة">×</button></div>
+            <div class="flex items-center justify-between gap-3"><a href="{{ route(app(App\Services\AdminLandingService::class)->routeFor($adminUser) ?? 'home') }}" class="rounded-2xl bg-white p-3"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="w-28"></a><button type="button" class="rounded-xl p-2 text-xl lg:hidden" @click="sidebarOpen = false" aria-label="إغلاق القائمة">×</button></div>
             <div class="mt-5 rounded-2xl bg-white/10 p-3"><p class="text-xs text-white/60">لوحة التشغيل</p><p class="mt-1 text-sm font-bold">{{ $adminUser->name }}</p></div>
             <nav class="mt-5 min-h-0 flex-1 space-y-5 overflow-y-auto pb-4" aria-label="التنقل الإداري">
                 @foreach ($navigation as $group)

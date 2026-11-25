@@ -11,6 +11,7 @@ use App\Models\DeliveryTier;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\CheckoutService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use DomainException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -40,6 +41,11 @@ class CheckoutServiceTest extends TestCase
         $this->assertSame('بجوار الصيدلية', $order->delivery_landmark);
         $this->assertSame(10, $order->delivery_duration_minutes);
         $this->assertSame((string) $setting->store_formatted_address, $order->store_address_snapshot);
+        $this->assertDatabaseHas('order_status_histories', ['order_id' => $order->id, 'from_status' => null, 'to_status' => 'pending', 'user_id' => $user->id]);
+
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $user->givePermissionTo('admin.access');
+        $this->actingAs($user)->get(route('admin.orders.show', $order))->assertOk()->assertSee('تم إنشاء الطلب');
     }
 
     public function test_checkout_rejects_a_variant_when_its_product_was_unpublished(): void

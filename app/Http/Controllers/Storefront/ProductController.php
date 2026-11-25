@@ -33,7 +33,7 @@ class ProductController extends Controller
                 });
             })
             ->when($request->filled('brand'), fn (Builder $query) => $query->whereHas('brand', fn (Builder $brand) => $brand->where('slug', $request->string('brand'))))
-            ->when($request->filled('category'), fn (Builder $query) => $query->whereHas('category', fn (Builder $category) => $category->where('slug', $request->string('category'))))
+            ->when($request->filled('category'), fn (Builder $query) => $query->whereIn('category_id', Category::query()->where('slug', $request->string('category'))->first()?->activeTreeIds() ?? []))
             ->when($request->filled('concern'), fn (Builder $query) => $query->whereHas('concerns', fn (Builder $concern) => $concern->where('slug', $request->string('concern'))))
             ->when($request->filled('skin_type'), fn (Builder $query) => $query->whereHas('skinTypes', fn (Builder $skinType) => $skinType->where('slug', $request->string('skin_type'))))
             ->when($request->string('availability')->value() === 'in_stock', fn (Builder $query) => $query->whereHas('variants', fn (Builder $variant) => $variant->where('is_active', true)->where('stock_quantity', '>', 0)))

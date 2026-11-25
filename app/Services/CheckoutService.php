@@ -56,6 +56,7 @@ class CheckoutService
                 $order->items()->create(['product_variant_id' => $variant->id, 'product_name' => $variant->product->name_ar, 'variant_name' => $variant->name ?? $variant->size, 'sku' => $variant->sku, 'unit_price' => $variant->price, 'quantity' => $item->quantity, 'subtotal' => $line->toScale(3, RoundingMode::HalfUp)]);
                 $this->stock->adjust($variant, -$item->quantity, StockMovementType::OrderSale, 'order-sale-'.$order->id.'-'.$variant->id, $user, $order->number);
             }
+            $order->statusHistory()->create(['user_id' => $user?->id, 'from_status' => null, 'to_status' => OrderStatus::Pending->value]);
             $lockedCart->items()->delete();
 
             return $order;

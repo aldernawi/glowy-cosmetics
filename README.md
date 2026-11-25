@@ -52,4 +52,4 @@ php artisan view:cache
 - خريطة الموقع: `/sitemap.xml`
 - تعليمات محركات البحث: `/robots.txt`
 
-صور المنتجات وصورة Hero الجديدة تُحوّل إلى WebP عند الرفع. تأكد في الإنتاج من تفعيل امتداد GD وربط `storage/app/public` عبر `php artisan storage:link`.
+تُحفظ الصور المرفوعة كما هي بعد التحقق من محتواها داخل `public/storage` مباشرة، لذلك لا تحتاج `php artisan storage:link`. يُفضّل رفع الصور بصيغة WebP أو AVIF. لتغيير مكان الحفظ اضبط `FILESYSTEM_PUBLIC_ROOT`.

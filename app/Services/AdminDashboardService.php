@@ -38,8 +38,8 @@ class AdminDashboardService
             'recent_orders' => Order::query()->latest()->limit(6)->get(),
             'sales_by_day' => $lastSevenDays,
             'orders_by_status' => Order::query()->select('status', DB::raw('COUNT(*) as total'))->groupBy('status')->pluck('total', 'status'),
-            'top_products' => DB::table('order_items')->select('product_name', DB::raw('SUM(quantity) as quantity'))->groupBy('product_name')->orderByDesc('quantity')->limit(5)->get(),
-            'top_brands' => DB::table('brands')->leftJoin('products', 'brands.id', '=', 'products.brand_id')->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')->leftJoin('order_items', 'product_variants.id', '=', 'order_items.product_variant_id')->select('brands.name_ar', DB::raw('COALESCE(SUM(order_items.quantity), 0) as quantity'))->groupBy('brands.id', 'brands.name_ar')->orderByDesc('quantity')->limit(5)->get(),
+            'top_products' => DB::table('order_items')->join('orders', 'orders.id', '=', 'order_items.order_id')->whereNotIn('orders.status', ['cancelled', 'returned'])->select('product_name', DB::raw('SUM(quantity) as quantity'))->groupBy('product_name')->orderByDesc('quantity')->limit(5)->get(),
+            'top_brands' => DB::table('brands')->leftJoin('products', 'brands.id', '=', 'products.brand_id')->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')->leftJoin('order_items', 'product_variants.id', '=', 'order_items.product_variant_id')->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')->select('brands.name_ar', DB::raw("COALESCE(SUM(CASE WHEN orders.status NOT IN ('cancelled', 'returned') THEN order_items.quantity ELSE 0 END), 0) as quantity"))->groupBy('brands.id', 'brands.name_ar')->orderByDesc('quantity')->limit(5)->get(),
         ];
     }
 }

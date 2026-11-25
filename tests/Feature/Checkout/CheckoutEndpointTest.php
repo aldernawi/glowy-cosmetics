@@ -95,6 +95,60 @@ class CheckoutEndpointTest extends TestCase
         $this->assertSame(2, $variant->refresh()->stock_quantity);
     }
 
+    public function test_a_failed_checkout_keeps_what_the_customer_typed(): void
+    {
+        [$user] = $this->readyCart();
+        Http::fake(['api.heigit.org/openrouteservice/*' => Http::response([], 500)]);
+
+        $this->actingAs($user)->from(route('checkout.index'))
+            ->post(route('checkout.store'), $this->checkoutPayload(['customer_name' => 'أمل', 'notes' => 'اتصلي أولًا']))
+            ->assertRedirect(route('checkout.index'));
+
+        $this->actingAs($user)->get(route('checkout.index'))
+            ->assertSee('تعذر تأكيد الطلب')
+            ->assertSee('value="أمل"', false)
+            ->assertSee('اتصلي أولًا')
+            ->assertSee('name="latitude" value="32.9000000"', false);
+    }
+
+    public function test_checkout_validates_and_normalizes_phone_numbers(): void
+    {
+        [$user] = $this->readyCart();
+        Http::fake(['api.heigit.org/openrouteservice/*' => Http::response(['routes' => [['summary' => ['distance' => 5000, 'duration' => 600]]]])]);
+
+        foreach (['abc', '123', '091-ABC-4567', '+++0912345678'] as $phone) {
+            $this->actingAs($user)->post(route('checkout.store'), $this->checkoutPayload(['phone' => $phone]))
+                ->assertSessionHasErrors(['phone' => 'أدخلي رقم هاتف صحيحًا، مثل 0912345678.']);
+        }
+        $this->assertDatabaseCount('orders', 0);
+
+        $this->actingAs($user)->post(route('checkout.store'), $this->checkoutPayload(['phone' => '٠٩١ ٢٣٤-٥٦٧٨', 'secondary_phone' => '+218 92 1234567']))
+            ->assertRedirect(route('checkout.success'));
+        $this->assertDatabaseHas('orders', ['phone' => '0912345678', 'secondary_phone' => '+218921234567']);
+    }
+
+    public function test_delivery_quotes_are_rate_limited_per_customer(): void
+    {
+        [$user] = $this->readyCart();
+        Http::fake(['api.heigit.org/openrouteservice/*' => Http::response(['routes' => [['summary' => ['distance' => 5000, 'duration' => 600]]]])]);
+        $location = ['latitude' => '32.9000000', 'longitude' => '13.2000000'];
+
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            $this->actingAs($user)->postJson(route('checkout.quote'), $location)->assertOk();
+        }
+
+        $this->actingAs($user)->postJson(route('checkout.quote'), $location)->assertTooManyRequests()->assertJsonPath('message', 'محاولات كثيرة خلال وقت قصير. انتظري دقيقة ثم أعيدي المحاولة.');
+        $this->actingAs($user)->from(route('checkout.index'))->post(route('checkout.store'), $this->checkoutPayload())
+            ->assertRedirect(route('checkout.index'))->assertSessionHasErrors('checkout')->assertSessionHasInput('customer_name');
+        Http::assertSentCount(10);
+    }
+
+    /** @param array<string, string> $overrides */
+    private function checkoutPayload(array $overrides = []): array
+    {
+        return $overrides + ['customer_name' => 'عميلة', 'phone' => '0910000000', 'latitude' => '32.9000000', 'longitude' => '13.2000000', 'location_confirmed' => '1'];
+    }
+
     /** @return array{User, ProductVariant} */
     private function readyCart(): array
     {

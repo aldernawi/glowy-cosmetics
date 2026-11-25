@@ -118,4 +118,16 @@ class CartItemManagementTest extends TestCase
 
         $this->assertDatabaseMissing('cart_items', ['product_variant_id' => $variant->id]);
     }
+
+    public function test_an_ajax_addition_returns_the_refreshed_cart_drawer(): void
+    {
+        $variant = Product::query()->create(['name_ar' => 'مرطب الدرج', 'slug' => 'drawer-moisturizer'])->createDefaultVariant('DRAWER-1', '11.000');
+        $variant->update(['stock_quantity' => 3]);
+
+        $html = $this->postJson(route('cart.items.store'), ['product_variant_id' => $variant->id, 'quantity' => 2])->assertOk()->json('drawer_html');
+
+        $this->assertStringContainsString('مرطب الدرج', $html);
+        $this->assertStringContainsString('22.000 د.ل', $html);
+        $this->assertStringNotContainsString('سلتك تنتظر اختياراتك', $html);
+    }
 }

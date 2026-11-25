@@ -18,7 +18,7 @@ class UpdateBrandRequest extends FormRequest
     {
         /** @var Brand $brand */ $brand = $this->route('brand');
 
-        return ['name_ar' => ['required', 'string', 'max:255'], 'name_en' => ['nullable', 'string', 'max:255'], 'slug' => ['required', 'alpha_dash', 'max:255', Rule::unique('brands', 'slug')->ignore($brand)], 'description' => ['nullable', 'string'], 'website' => ['nullable', 'url', 'max:255'], 'logo' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'], 'is_active' => ['required', 'boolean'], 'is_featured' => ['nullable', 'boolean'], 'sort_order' => ['nullable', 'integer', 'min:0']];
+        return ['name_ar' => ['required', 'string', 'max:255'], 'name_en' => ['nullable', 'string', 'max:255'], 'slug' => ['required', 'alpha_dash', 'max:255', Rule::unique('brands', 'slug')->ignore($brand)], 'description' => ['nullable', 'string'], 'website' => ['nullable', 'url', 'max:255'], 'logo' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240'], 'is_active' => ['required', 'boolean'], 'is_featured' => ['nullable', 'boolean'], 'sort_order' => ['nullable', 'integer', 'min:0']];
     }
 
     protected function prepareForValidation(): void

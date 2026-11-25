@@ -1,0 +1,6 @@
+<div class="mt-6 flex-1 space-y-4 overflow-y-auto">
+    @forelse($cart?->items ?? [] as $item)
+        <div class="flex gap-3 rounded-2xl bg-white p-3"><div class="h-16 w-16 shrink-0 rounded-xl bg-glowy-blush p-1">@if($item->productVariant->product->images->first())<img src="{{ $item->productVariant->product->images->first()->url }}" alt="" class="h-full w-full object-contain" onerror="this.onerror=null;this.src='{{ asset('images/product-placeholder.svg') }}'">@else<span class="flex h-full items-center justify-center text-glowy-rose">✦</span>@endif</div><div class="min-w-0"><p class="truncate font-bold">{{ $item->productVariant->product->name_ar }}</p><p class="text-sm text-glowy-muted">الكمية: {{ $item->quantity }}</p><p class="text-sm font-bold text-glowy-rose">{{ $item->productVariant->price }} د.ل</p></div></div>
+    @empty<div class="rounded-3xl bg-glowy-blush p-8 text-center"><span class="text-4xl text-glowy-rose">✦</span><p class="mt-4 font-bold">سلتك تنتظر اختياراتك</p></div>@endforelse
+</div>
+<div class="border-t border-glowy-champagne pt-5"><div class="flex justify-between"><span>المجموع الفرعي</span><strong>{{ $subtotal }} د.ل</strong></div><a href="{{ route('cart.index') }}" class="mt-4 flex min-h-12 items-center justify-center rounded-full bg-glowy-rose font-bold text-white">عرض السلة</a></div>

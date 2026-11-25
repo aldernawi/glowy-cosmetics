@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -10,15 +13,17 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductService
 {
-    /** @param array<string, mixed> $attributes */
-    public function __construct(private ProductImageService $images) {}
+    public function __construct(private ProductImageService $images, private ProductVariantService $variants) {}
 
-    /** @param array<int, UploadedFile> $files */
-    public function createWithDefaultVariant(array $attributes, array $files = []): Product
+    /**
+     * @param  array<string, mixed>  $attributes
+     * @param  array<int, UploadedFile>  $files
+     */
+    public function createWithDefaultVariant(array $attributes, array $files = [], ?User $actor = null): Product
     {
         $storedPaths = collect();
         try {
-            return DB::transaction(function () use ($attributes, $files, $storedPaths): Product {
+            return DB::transaction(function () use ($attributes, $files, $storedPaths, $actor): Product {
                 $product = Product::query()->create([
                     'brand_id' => $attributes['brand_id'] ?? null,
                     'category_id' => $attributes['category_id'] ?? null,
@@ -34,13 +39,14 @@ class ProductService
                     'is_new' => $attributes['is_new'] ?? false,
                 ]);
 
-                $product->createDefaultVariant($attributes['sku'], $attributes['price'])->update([
+                $variant = $product->createDefaultVariant($attributes['sku'], $attributes['price']);
+                $variant->update([
                     'name' => $attributes['default_variant_name'] ?? null,
                     'size' => $attributes['default_variant_size'] ?? null,
                     'compare_at_price' => $attributes['compare_at_price'] ?? null,
-                    'stock_quantity' => $attributes['stock_quantity'] ?? 0,
                     'low_stock_threshold' => $attributes['low_stock_threshold'] ?? 5,
                 ]);
+                $this->variants->recordOpeningStock($variant, (int) ($attributes['stock_quantity'] ?? 0), $actor);
                 $this->syncTaxonomies($product, $attributes);
                 foreach ($files as $file) {
                     $storedPaths->push($this->images->store($product, $file, $product->name_ar)->path);
@@ -93,22 +99,29 @@ class ProductService
         }
     }
 
-    /** @return Collection<int, string> */
-    public function deleteOrArchive(Product $product): Collection
+    /**
+     * Returns the image paths of a deleted product, or null when it was archived to keep its history.
+     *
+     * @return Collection<int, string>|null
+     */
+    public function deleteOrArchive(Product $product): ?Collection
     {
-        if ($product->variants()->whereHas('orderItems')->exists()) {
-            DB::transaction(function () use ($product): void {
+        return DB::transaction(function () use ($product): ?Collection {
+            $variants = ProductVariant::query()->where('product_id', $product->id)->lockForUpdate()->get();
+            CartItem::query()->whereIn('product_variant_id', $variants->modelKeys())->delete();
+
+            if ($variants->contains(fn (ProductVariant $variant) => $variant->hasHistory())) {
                 $product->update(['is_active' => false]);
                 $product->variants()->update(['is_active' => false]);
-            });
 
-            return collect();
-        }
+                return null;
+            }
 
-        $paths = $product->images()->pluck('path')->unique();
-        DB::transaction(fn () => $product->delete());
+            $paths = $product->images()->pluck('path')->unique();
+            $product->delete();
 
-        return $paths;
+            return $paths;
+        });
     }
 
     /** @param array<string, mixed> $attributes */

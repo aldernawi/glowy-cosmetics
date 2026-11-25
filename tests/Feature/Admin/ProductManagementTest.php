@@ -97,4 +97,18 @@ class ProductManagementTest extends TestCase
         $this->assertMatchesRegularExpression('/<input name="default_variant_size"[^>]*value="100ml"/', $html);
         $this->assertMatchesRegularExpression('/<input name="compare_at_price"[^>]*value="60\.000"/', $html);
     }
+
+    public function test_a_compare_price_below_the_default_price_is_rejected(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+        $product = Product::query()->create(['name_ar' => 'كريم', 'slug' => 'compare']);
+        $product->createDefaultVariant('COMPARE-1', '50.000');
+
+        foreach (['1.000' => true, 'abc' => true, '50.000' => false, '60.000' => false] as $price => $fails) {
+            $response = $this->actingAs($administrator)->patch(route('admin.products.update', $product), ['name_ar' => 'كريم', 'slug' => 'compare', 'compare_at_price' => (string) $price]);
+            $fails ? $response->assertSessionHasErrors('compare_at_price') : $response->assertSessionHasNoErrors();
+        }
+    }
 }

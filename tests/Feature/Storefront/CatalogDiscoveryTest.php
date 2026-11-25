@@ -77,4 +77,36 @@ class CatalogDiscoveryTest extends TestCase
 
         $this->get(route('products.index'))->assertOk()->assertSee('5.000 د.ل')->assertSee('متوفر');
     }
+
+    public function test_a_parent_category_lists_products_of_its_active_descendants(): void
+    {
+        $parent = Category::query()->create(['name_ar' => 'العناية', 'slug' => 'care']);
+        $child = Category::query()->create(['name_ar' => 'الوجه', 'slug' => 'face', 'parent_id' => $parent->id]);
+        $grandchild = Category::query()->create(['name_ar' => 'السيروم', 'slug' => 'face-serum', 'parent_id' => $child->id]);
+        $hidden = Category::query()->create(['name_ar' => 'مخفي', 'slug' => 'hidden-child', 'parent_id' => $parent->id, 'is_active' => false]);
+        $other = Category::query()->create(['name_ar' => 'الشعر', 'slug' => 'hair']);
+        foreach ([[$grandchild, 'منتج الحفيد'], [$hidden, 'منتج المخفي'], [$other, 'منتج الشعر']] as [$category, $name]) {
+            Product::query()->create(['category_id' => $category->id, 'name_ar' => $name, 'slug' => 'in-'.$category->slug])->createDefaultVariant('CAT-'.$category->id, '5.000');
+        }
+
+        $this->get(route('products.index', ['category' => 'care']))->assertOk()
+            ->assertSee('منتج الحفيد')->assertDontSee('منتج المخفي')->assertDontSee('منتج الشعر');
+        $this->get(route('products.index', ['category' => 'missing']))->assertOk()->assertDontSee('منتج الحفيد');
+    }
+
+    public function test_malformed_array_parameters_do_not_break_storefront_pages(): void
+    {
+        foreach (['/products?q[]=x', '/products?brand[]=x', '/products?category[a][b]=x&sort[]=name', '/cart?q[]=x', '/?q[]=x'] as $url) {
+            $this->get($url)->assertOk();
+        }
+    }
+
+    public function test_the_primary_image_is_the_first_product_image(): void
+    {
+        $product = Product::query()->create(['name_ar' => 'كريم', 'slug' => 'primary-image']);
+        $product->images()->create(['path' => 'products/first.webp', 'sort_order' => 0]);
+        $product->images()->create(['path' => 'products/primary.webp', 'sort_order' => 1, 'is_primary' => true]);
+
+        $this->assertSame('products/primary.webp', $product->load('images')->images->first()->path);
+    }
 }

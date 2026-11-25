@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Enums\StockMovementType;
 use App\Models\Order;
 use App\Models\User;
@@ -15,6 +16,21 @@ class OrderService
     public function nextStatuses(Order $order): array
     {
         return [OrderStatus::Pending->value => [OrderStatus::Confirmed, OrderStatus::Cancelled], OrderStatus::Confirmed->value => [OrderStatus::Preparing, OrderStatus::Cancelled], OrderStatus::Preparing->value => [OrderStatus::Ready, OrderStatus::Cancelled], OrderStatus::Ready->value => [OrderStatus::OutForDelivery, OrderStatus::Cancelled], OrderStatus::OutForDelivery->value => [OrderStatus::Delivered], OrderStatus::Delivered->value => [OrderStatus::Returned]][$order->status->value] ?? [];
+    }
+
+    public function updatePayment(Order $order, PaymentStatus $status): Order
+    {
+        return DB::transaction(function () use ($order, $status): Order {
+            $order = Order::query()->lockForUpdate()->findOrFail($order->id);
+
+            if ($status === PaymentStatus::Paid && in_array($order->status, [OrderStatus::Cancelled, OrderStatus::Returned], true)) {
+                throw new DomainException('A cancelled or returned order cannot be marked as paid.');
+            }
+
+            $order->update(['payment_status' => $status]);
+
+            return $order;
+        });
     }
 
     public function transition(Order $order, OrderStatus $status, ?User $actor = null): Order

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\AdminRoleService;
+use DomainException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,7 +42,7 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request, AdminRoleService $roles): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -48,9 +50,11 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
-
-        $user->delete();
+        try {
+            $roles->deleteAccount($user, fn () => Auth::logout());
+        } catch (DomainException) {
+            return back()->withErrors(['password' => 'لا يمكن حذف حساب آخر مسؤول في المتجر. عيّني مسؤولًا آخر أولًا.'], 'userDeletion');
+        }
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

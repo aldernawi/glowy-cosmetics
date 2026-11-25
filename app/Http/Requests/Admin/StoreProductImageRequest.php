@@ -13,6 +13,6 @@ class StoreProductImageRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240', 'required_without:images'], 'images' => ['nullable', 'array', 'max:8', 'required_without:image'], 'images.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'], 'alt' => ['nullable', 'string', 'max:255']];
+        return ['image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240', 'required_without:images'], 'images' => ['nullable', 'array', 'max:8', 'required_without:image'], 'images.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240'], 'alt' => ['nullable', 'string', 'max:255']];
     }
 }

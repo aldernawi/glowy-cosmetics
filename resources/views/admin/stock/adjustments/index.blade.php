@@ -17,15 +17,14 @@
             </select>
             @error('product_variant_id')<span class="text-xs text-red-700">{{ $message }}</span>@enderror
         </label>
-        <x-ui.input name="delta" label="التغيير في الكمية (+ أو -)" type="number" required />
+        <div class="grid gap-1"><x-ui.input name="delta" label="التغيير في الكمية (+ أو -)" type="number" :value="old('delta')" required />@error('delta')<span class="text-xs font-bold text-red-700">{{ $message }}</span>@enderror</div>
         <label class="grid gap-2 text-sm font-bold">نوع الحركة
             <select name="type" class="min-h-11 rounded-xl border-glowy-champagne" required>
-                <option value="manual_in">إضافة يدوية</option>
-                <option value="manual_out">إخراج يدوي</option>
-                <option value="adjustment">تسوية</option>
-                <option value="opening">رصيد افتتاحي</option>
-                <option value="damage">تالف</option>
+                @foreach (['manual_in' => 'إضافة يدوية (+)', 'manual_out' => 'إخراج يدوي (-)', 'adjustment' => 'تسوية (+ أو -)', 'opening' => 'رصيد افتتاحي (+)', 'damage' => 'تالف (-)'] as $value => $label)
+                    <option value="{{ $value }}" @selected(old('type') === $value)>{{ $label }}</option>
+                @endforeach
             </select>
+            @error('type')<span class="text-xs font-bold text-red-700">{{ $message }}</span>@enderror
         </label>
         <label class="grid gap-2 text-sm font-bold md:col-span-2">ملاحظات
             <textarea name="notes" rows="3" class="rounded-xl border-glowy-champagne">{{ old('notes') }}</textarea>
@@ -45,4 +44,5 @@
             </tbody>
         </table>
     </div>
+    <div class="mt-6">{{ $variants->links() }}</div>
 </x-layouts.admin>

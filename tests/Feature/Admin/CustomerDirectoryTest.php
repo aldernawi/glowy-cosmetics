@@ -21,4 +21,15 @@ class CustomerDirectoryTest extends TestCase
         $this->actingAs($admin)->get(route('admin.customers.index'))
             ->assertOk()->assertSee('عميلة Glowy');
     }
+
+    public function test_the_directory_links_to_each_customer_profile(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
+        $customer = User::factory()->create();
+
+        $this->actingAs($admin)->get(route('admin.customers.index'))->assertSee('href="'.route('admin.customers.show', $customer).'"', false);
+        $this->actingAs($admin)->get(route('admin.customers.show', $customer))->assertOk();
+    }
 }

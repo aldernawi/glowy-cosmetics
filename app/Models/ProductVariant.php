@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StockMovementType;
 use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +30,13 @@ class ProductVariant extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /** Orders or stock activity beyond the opening balance must survive catalog clean-up. */
+    public function hasHistory(): bool
+    {
+        return $this->orderItems()->exists()
+            || $this->stockMovements()->where('type', '!=', StockMovementType::Opening->value)->exists();
     }
 
     public function isOnSale(): bool

@@ -67,4 +67,16 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_catalog_managers_are_sent_to_a_page_they_can_open_after_login(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $manager = User::factory()->create();
+        $manager->assignRole('catalog-manager');
+        $this->get(route('admin.dashboard'))->assertRedirect(route('login'));
+
+        $this->post('/login', ['email' => $manager->email, 'password' => 'password'])->assertRedirect(route('admin.products.index', absolute: false));
+
+        $this->get(route('admin.products.index'))->assertOk()->assertDontSee('href="'.route('admin.dashboard').'"', false);
+    }
 }

@@ -42,7 +42,7 @@ class StoreProductRequest extends FormRequest
             'is_featured' => ['sometimes', 'boolean'],
             'is_new' => ['sometimes', 'boolean'],
             'images' => ['nullable', 'array', 'max:8'],
-            'images.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
+            'images.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'mimes:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
         ];
     }
 

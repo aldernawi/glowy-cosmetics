@@ -35,8 +35,8 @@ Route::post('/cart/items', [CartItemController::class, 'store'])->name('cart.ite
 Route::patch('/cart/items/{cartItem}', [CartItemController::class, 'update'])->name('cart.items.update');
 Route::delete('/cart/items/{cartItem}', [CartItemController::class, 'destroy'])->name('cart.items.destroy');
 Route::get('/checkout', CheckoutController::class)->name('checkout.index');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::post('/checkout/quote', [CheckoutController::class, 'quote'])->name('checkout.quote');
+Route::post('/checkout', [CheckoutController::class, 'store'])->middleware('throttle:checkout')->name('checkout.store');
+Route::post('/checkout/quote', [CheckoutController::class, 'quote'])->middleware('throttle:checkout')->name('checkout.quote');
 Route::get('/locations/search', [LocationSearchController::class, 'search'])->middleware('throttle:geocoding')->name('locations.search');
 Route::get('/locations/reverse', [LocationSearchController::class, 'reverse'])->middleware('throttle:geocoding')->name('locations.reverse');
 Route::get('/checkout/success', [CustomerOrderController::class, 'success'])->name('checkout.success');

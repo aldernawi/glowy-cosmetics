@@ -35,6 +35,24 @@ class Category extends Model
         return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order');
     }
 
+    /**
+     * This category's id plus every active category nested below it.
+     *
+     * @return array<int, int>
+     */
+    public function activeTreeIds(): array
+    {
+        $ids = [$this->id];
+        $frontier = [$this->id];
+
+        while ($frontier !== []) {
+            $frontier = self::query()->whereIn('parent_id', $frontier)->whereNotIn('id', $ids)->where('is_active', true)->pluck('id')->all();
+            $ids = [...$ids, ...$frontier];
+        }
+
+        return $ids;
+    }
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
