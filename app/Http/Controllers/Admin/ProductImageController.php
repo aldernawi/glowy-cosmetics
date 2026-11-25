@@ -6,23 +6,25 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductImageRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\MediaCleanupService;
 use App\Services\ProductImageService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
     public function store(StoreProductImageRequest $request, Product $product, ProductImageService $images): RedirectResponse
     {
-        $images->store($product, $request->file('image'), $request->string('alt')->toString());
+        collect($request->file('images', []))->prepend($request->file('image'))->filter()->each(fn ($file) => $images->store($product, $file, $request->string('alt')->toString()));
 
-        return to_route('admin.products.index')->with('status', 'تم رفع صورة المنتج.');
+        return to_route('admin.products.edit', $product)->with('status', 'تم رفع صور المنتج.');
     }
 
-    public function destroy(ProductImage $image): RedirectResponse
+    public function destroy(ProductImage $image, MediaCleanupService $media): RedirectResponse
     {
         $path = $image->path;
+        $product = $image->product;
         DB::transaction(function () use ($image): void {
             $product = $image->product;
             $wasPrimary = $image->is_primary;
@@ -31,9 +33,9 @@ class ProductImageController extends Controller
                 $product->images()->orderBy('sort_order')->first()?->update(['is_primary' => true]);
             }
         });
-        Storage::disk('public')->delete($path);
+        $media->deleteProductImageIfUnreferenced($path);
 
-        return to_route('admin.products.index')->with('status', 'تم حذف صورة المنتج.');
+        return to_route('admin.products.edit', $product)->with('status', 'تم حذف صورة المنتج.');
     }
 
     public function makePrimary(ProductImage $image): RedirectResponse
@@ -43,6 +45,14 @@ class ProductImageController extends Controller
             $image->update(['is_primary' => true]);
         });
 
-        return to_route('admin.products.index')->with('status', 'تم تعيين الصورة الأساسية.');
+        return to_route('admin.products.edit', $image->product)->with('status', 'تم تعيين الصورة الأساسية.');
+    }
+
+    public function move(ProductImage $image, Request $request, ProductImageService $images): RedirectResponse
+    {
+        $validated = $request->validate(['direction' => ['required', 'in:up,down']]);
+        $images->move($image, $validated['direction']);
+
+        return to_route('admin.products.edit', $image->product)->with('status', 'تم ترتيب صورة المنتج.');
     }
 }

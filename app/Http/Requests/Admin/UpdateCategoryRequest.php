@@ -10,7 +10,7 @@ class UpdateCategoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('admin.access') ?? false;
+        return $this->user()?->canAny(['admin.access', 'catalog.manage', 'categories.update']) ?? false;
     }
 
     public function rules(): array
@@ -21,6 +21,11 @@ class UpdateCategoryRequest extends FormRequest
             'name_ar' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'alpha_dash', 'max:255', Rule::unique('categories')->ignore($category)],
             'parent_id' => ['nullable', 'integer', Rule::exists('categories', 'id')],
+            'name_en' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
+            'sort_order' => ['nullable', 'integer', 'min:0'],
+            'is_featured' => ['nullable', 'boolean'],
             'is_active' => ['required', 'boolean'],
         ];
     }

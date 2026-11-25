@@ -10,7 +10,7 @@ class AdjustStockRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('admin.access') ?? false;
+        return $this->user()?->canAny(['admin.access', 'inventory.adjust']) ?? false;
     }
 
     public function rules(): array

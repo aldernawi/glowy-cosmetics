@@ -8,11 +8,11 @@ class StoreProductImageRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('admin.access') ?? false;
+        return $this->user()?->canAny(['admin.access', 'catalog.manage', 'products.update']) ?? false;
     }
 
     public function rules(): array
     {
-        return ['image' => ['required', 'image', 'max:5120'], 'alt' => ['nullable', 'string', 'max:255']];
+        return ['image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240', 'required_without:images'], 'images' => ['nullable', 'array', 'max:8', 'required_without:image'], 'images.*' => ['file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'], 'alt' => ['nullable', 'string', 'max:255']];
     }
 }

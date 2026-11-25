@@ -13,7 +13,7 @@ class Order extends Model
 
     protected function casts(): array
     {
-        return ['status' => OrderStatus::class, 'payment_status' => PaymentStatus::class, 'delivery_latitude' => 'decimal:7', 'delivery_longitude' => 'decimal:7', 'delivery_distance_km' => 'decimal:3', 'delivery_fee' => 'decimal:3', 'subtotal' => 'decimal:3', 'discount' => 'decimal:3', 'total' => 'decimal:3'];
+        return ['status' => OrderStatus::class, 'payment_status' => PaymentStatus::class, 'delivery_latitude' => 'decimal:7', 'delivery_longitude' => 'decimal:7', 'delivery_distance_km' => 'decimal:3', 'delivery_duration_minutes' => 'integer', 'delivery_fee' => 'decimal:3', 'subtotal' => 'decimal:3', 'discount' => 'decimal:3', 'total' => 'decimal:3'];
     }
 
     public function items(): HasMany

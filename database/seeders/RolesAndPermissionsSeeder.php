@@ -13,12 +13,28 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $permission = Permission::findOrCreate('admin.access', 'web');
-        $catalogPermission = Permission::findOrCreate('catalog.manage', 'web');
+        Permission::findOrCreate('admin.access', 'web');
+        Permission::findOrCreate('catalog.manage', 'web'); // Backward-compatible umbrella permission for pre-existing staff.
+        foreach ([
+            'admin.dashboard.view',
+            'products.view', 'products.create', 'products.update', 'products.delete',
+            'brands.view', 'brands.create', 'brands.update', 'brands.delete',
+            'categories.view', 'categories.create', 'categories.update', 'categories.delete',
+            'inventory.view', 'inventory.adjust',
+            'orders.view', 'orders.update',
+            'delivery.manage', 'content.manage', 'reports.view', 'users.manage', 'customers.view',
+        ] as $name) {
+            Permission::findOrCreate($name, 'web');
+        }
         $administrator = Role::findOrCreate('administrator', 'web');
         $catalogManager = Role::findOrCreate('catalog-manager', 'web');
 
-        $administrator->syncPermissions([$permission, $catalogPermission]);
-        $catalogManager->syncPermissions([$permission, $catalogPermission]);
+        $administrator->syncPermissions(Permission::query()->pluck('name')->all());
+        $catalogManager->syncPermissions([
+            'catalog.manage',
+            'products.view', 'products.create', 'products.update', 'products.delete',
+            'brands.view', 'brands.create', 'brands.update', 'brands.delete',
+            'categories.view', 'categories.create', 'categories.update', 'categories.delete',
+        ]);
     }
 }

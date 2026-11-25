@@ -9,7 +9,7 @@ class StoreAdminUserRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('admin.access') ?? false;
+        return $this->user()?->canAny(['admin.access', 'users.manage']) ?? false;
     }
 
     public function rules(): array

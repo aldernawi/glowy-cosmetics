@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class PhaseFourReleaseTest extends TestCase
@@ -28,6 +29,31 @@ class PhaseFourReleaseTest extends TestCase
         ])->assertRedirect(route('admin.content.index'));
 
         $this->get(route('home'))->assertOk()->assertSee('وهجك يبدأ هنا')->assertSee('توصيل محسوب بدقة');
+    }
+
+    public function test_admin_can_manage_extra_homepage_banners_and_section_visibility(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $admin = User::factory()->create();
+        $admin->givePermissionTo('admin.access');
+
+        $this->actingAs($admin)->post(route('admin.content.banners.store'), [
+            'title' => 'عرض العناية المسائية',
+            'body' => 'اختيارات هادئة قبل النوم',
+            'cta_label' => 'اكتشفي العرض',
+            'cta_url' => '/products',
+            'sort_order' => 3,
+            'is_active' => true,
+        ])->assertRedirect(route('admin.content.index'));
+
+        $this->get(route('home'))->assertOk()->assertSee('عرض العناية المسائية');
+
+        $this->actingAs($admin)->put(route('admin.content.sections.update'), ['sections' => [
+            ['key' => 'categories', 'is_visible' => false, 'sort_order' => 1],
+            ['key' => 'concerns', 'is_visible' => true, 'sort_order' => 2],
+        ]])->assertRedirect(route('admin.content.index'));
+
+        $this->get(route('home'))->assertDontSee('تسوّقي حسب التصنيف');
     }
 
     public function test_admin_reports_are_visible_and_exportable_as_csv(): void
@@ -56,6 +82,14 @@ class PhaseFourReleaseTest extends TestCase
     {
         $this->get(route('seo.sitemap'))->assertOk()->assertHeader('content-type', 'application/xml');
         $this->get(route('seo.robots'))->assertOk()->assertSee('Sitemap:');
+    }
+
+    public function test_catalog_changes_invalidate_the_cached_sitemap(): void
+    {
+        Cache::put('seo.sitemap', 'stale-map', 3600);
+        Product::query()->create(['name_ar' => 'واقي شمس', 'slug' => 'fresh-sunscreen']);
+
+        $this->assertNull(Cache::get('seo.sitemap'));
     }
 
     public function test_filtered_catalog_is_not_indexed_and_uses_the_clean_canonical_url(): void

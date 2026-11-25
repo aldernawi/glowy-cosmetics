@@ -16,9 +16,9 @@ class ReportService
 {
     public const REPORTS = ['sales', 'orders', 'products', 'brands', 'categories', 'customers', 'stock', 'movements'];
 
-    public function dashboard(): array
+    public function dashboard(array $filters = []): array
     {
-        $sales = Order::query()->where('status', OrderStatus::Delivered->value);
+        $sales = $this->filteredOrders(Order::query()->where('status', OrderStatus::Delivered->value), $filters);
         $salesTotal = BigDecimal::of((string) ($sales->sum('total') ?: '0'))->toScale(3);
         $salesCount = (clone $sales)->count();
 
@@ -26,7 +26,7 @@ class ReportService
             'sales_total' => (string) $salesTotal,
             'sales_count' => $salesCount,
             'average_order' => $salesCount > 0 ? (string) $salesTotal->dividedBy($salesCount, 3) : '0.000',
-            'orders_count' => Order::query()->count(),
+            'orders_count' => $this->filteredOrders(Order::query(), $filters)->count(),
             'customers_count' => User::query()->whereHas('orders')->count(),
             'products_count' => Product::query()->count(),
             'low_stock_count' => ProductVariant::query()->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count(),
@@ -34,11 +34,11 @@ class ReportService
         ];
     }
 
-    public function rows(string $report): Collection
+    public function rows(string $report, array $filters = []): Collection
     {
         return match ($report) {
-            'sales' => Order::query()->where('status', OrderStatus::Delivered->value)->latest()->get()->map(fn (Order $order) => [$order->number, $order->created_at?->format('Y-m-d'), $order->customer_name, $order->subtotal, $order->delivery_fee, $order->total]),
-            'orders' => Order::query()->latest()->get()->map(fn (Order $order) => [$order->number, $order->created_at?->format('Y-m-d'), $order->customer_name, $order->status->value, $order->payment_status->value, $order->total]),
+            'sales' => $this->filteredOrders(Order::query()->where('status', OrderStatus::Delivered->value), $filters)->latest()->get()->map(fn (Order $order) => [$order->number, $order->created_at?->format('Y-m-d'), $order->customer_name, $order->subtotal, $order->delivery_fee, $order->total]),
+            'orders' => $this->filteredOrders(Order::query(), $filters)->latest()->get()->map(fn (Order $order) => [$order->number, $order->created_at?->format('Y-m-d'), $order->customer_name, $order->status->value, $order->payment_status->value, $order->total]),
             'products' => Product::query()->with(['brand', 'category', 'variants'])->orderBy('name_ar')->get()->map(fn (Product $product) => [$product->name_ar, $product->brand?->name_ar, $product->category?->name_ar, $product->variants->count(), $product->variants->sum('stock_quantity'), $product->is_active ? 'نعم' : 'لا']),
             'brands' => DB::table('brands')->leftJoin('products', 'brands.id', '=', 'products.brand_id')->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')->leftJoin('order_items', 'product_variants.id', '=', 'order_items.product_variant_id')->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')->select('brands.name_ar', DB::raw('COUNT(DISTINCT products.id) as products_count'), DB::raw("COALESCE(SUM(CASE WHEN orders.status = 'delivered' THEN order_items.quantity ELSE 0 END), 0) as sold_quantity"), DB::raw("COALESCE(SUM(CASE WHEN orders.status = 'delivered' THEN order_items.subtotal ELSE 0 END), 0) as revenue"))->groupBy('brands.id', 'brands.name_ar')->orderBy('brands.name_ar')->get()->map(fn ($row) => (array) $row),
             'categories' => DB::table('categories')->leftJoin('products', 'categories.id', '=', 'products.category_id')->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')->leftJoin('order_items', 'product_variants.id', '=', 'order_items.product_variant_id')->leftJoin('orders', 'order_items.order_id', '=', 'orders.id')->select('categories.name_ar', DB::raw('COUNT(DISTINCT products.id) as products_count'), DB::raw("COALESCE(SUM(CASE WHEN orders.status = 'delivered' THEN order_items.quantity ELSE 0 END), 0) as sold_quantity"), DB::raw("COALESCE(SUM(CASE WHEN orders.status = 'delivered' THEN order_items.subtotal ELSE 0 END), 0) as revenue"))->groupBy('categories.id', 'categories.name_ar')->orderBy('categories.name_ar')->get()->map(fn ($row) => (array) $row),
@@ -59,5 +59,14 @@ class ReportService
             'stock' => ['SKU', 'المنتج', 'الخيار', 'المخزون', 'حد التنبيه'],
             'movements' => ['التاريخ', 'SKU', 'المنتج', 'النوع', 'التغيير', 'قبل', 'بعد', 'المرجع', 'المستخدم'],
         };
+    }
+
+    /** @param array<string, mixed> $filters */
+    private function filteredOrders($query, array $filters)
+    {
+        return $query->when($filters['from'] ?? null, fn ($orders, $from) => $orders->whereDate('created_at', '>=', $from))
+            ->when($filters['to'] ?? null, fn ($orders, $to) => $orders->whereDate('created_at', '<=', $to))
+            ->when($filters['status'] ?? null, fn ($orders, $status) => $orders->where('status', $status))
+            ->when($filters['payment_status'] ?? null, fn ($orders, $status) => $orders->where('payment_status', $status));
     }
 }

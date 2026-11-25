@@ -19,7 +19,7 @@ class ProductOperationsTest extends TestCase
         $admin->givePermissionTo('admin.access');
         $product = Product::query()->create(['name_ar' => 'قديم', 'slug' => 'old-product']);
 
-        $this->actingAs($admin)->patch(route('admin.products.update', $product), ['name_ar' => 'جديد', 'slug' => 'new-product', 'is_active' => true])->assertRedirect(route('admin.products.index'));
+        $this->actingAs($admin)->patch(route('admin.products.update', $product), ['name_ar' => 'جديد', 'slug' => 'new-product', 'is_active' => true])->assertRedirect(route('admin.products.edit', 'new-product'));
         $this->assertDatabaseHas('products', ['id' => $product->id, 'name_ar' => 'جديد']);
         $product->refresh();
         $this->actingAs($admin)->delete(route('admin.products.destroy', $product))->assertRedirect(route('admin.products.index'));

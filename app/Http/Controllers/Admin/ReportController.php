@@ -12,19 +12,21 @@ class ReportController extends Controller
 {
     public function index(ReportService $reports): View
     {
-        return view('admin.reports.index', ['metrics' => $reports->dashboard(), 'reports' => ReportService::REPORTS]);
+        $filters = request()->validate(['from' => ['nullable', 'date'], 'to' => ['nullable', 'date', 'after_or_equal:from'], 'status' => ['nullable', 'string'], 'payment_status' => ['nullable', 'in:unpaid,paid']]);
+
+        return view('admin.reports.index', ['metrics' => $reports->dashboard($filters), 'reports' => ReportService::REPORTS, 'filters' => $filters]);
     }
 
     public function export(Request $request, ReportService $reports): StreamedResponse
     {
-        $validated = $request->validate(['report' => ['required', 'in:'.implode(',', ReportService::REPORTS)]]);
+        $validated = $request->validate(['report' => ['required', 'in:'.implode(',', ReportService::REPORTS)], 'from' => ['nullable', 'date'], 'to' => ['nullable', 'date', 'after_or_equal:from'], 'status' => ['nullable', 'string'], 'payment_status' => ['nullable', 'in:unpaid,paid']]);
         $report = $validated['report'];
 
-        return response()->streamDownload(function () use ($reports, $report): void {
+        return response()->streamDownload(function () use ($reports, $report, $validated): void {
             $stream = fopen('php://output', 'w');
             fwrite($stream, "\xEF\xBB\xBF");
             fputcsv($stream, $reports->headings($report));
-            foreach ($reports->rows($report) as $row) {
+            foreach ($reports->rows($report, $validated) as $row) {
                 fputcsv($stream, array_values((array) $row));
             }
             fclose($stream);

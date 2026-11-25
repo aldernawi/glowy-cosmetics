@@ -2,9 +2,12 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Brand;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class CatalogManagementTest extends TestCase
@@ -26,5 +29,63 @@ class CatalogManagementTest extends TestCase
             ->assertRedirect(route('admin.brands.index'));
 
         $this->assertDatabaseHas('brands', ['slug' => 'la-roche-posay']);
+    }
+
+    public function test_an_administrator_can_create_an_arabic_brand_without_manually_entering_a_slug(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+
+        $this->actingAs($administrator)
+            ->post(route('admin.brands.store'), ['name_ar' => 'لاروش بوزيه', 'is_active' => true])
+            ->assertRedirect(route('admin.brands.index'));
+
+        $this->assertDatabaseHas('brands', ['name_ar' => 'لاروش بوزيه']);
+    }
+
+    public function test_an_administrator_can_create_a_brand_with_a_logo(): void
+    {
+        Storage::fake('public');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+
+        $this->actingAs($administrator)->post(route('admin.brands.store'), [
+            'name_ar' => 'ماركة بالشعار',
+            'is_active' => true,
+            'logo' => new UploadedFile(public_path('images/glowy-logo.png'), 'brand.png', 'image/png', null, true),
+        ])->assertRedirect(route('admin.brands.index'));
+
+        $path = Brand::query()->where('name_ar', 'ماركة بالشعار')->value('logo_path');
+        $this->assertNotEmpty($path);
+        $this->assertStringEndsWith('.png', $path);
+        Storage::disk('public')->assertExists($path);
+    }
+
+    public function test_an_extremely_wide_brand_logo_is_stored_without_gd_processing(): void
+    {
+        Storage::fake('public');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+        $temporaryPath = tempnam(sys_get_temp_dir(), 'glowy-brand-logo-');
+        $image = imagecreatetruecolor(10000, 1);
+        imagepng($image, $temporaryPath);
+        imagedestroy($image);
+
+        try {
+            $this->actingAs($administrator)->post(route('admin.brands.store'), [
+                'name_ar' => 'شعار عريض جدًا',
+                'is_active' => true,
+                'logo' => new UploadedFile($temporaryPath, 'wide-brand.png', 'image/png', null, true),
+            ])->assertRedirect(route('admin.brands.index'));
+
+            $path = Brand::query()->where('name_ar', 'شعار عريض جدًا')->value('logo_path');
+            $this->assertNotEmpty($path);
+            Storage::disk('public')->assertExists($path);
+        } finally {
+            @unlink($temporaryPath);
+        }
     }
 }

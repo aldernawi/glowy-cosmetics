@@ -9,7 +9,7 @@ use RuntimeException;
 
 class DeliveryService
 {
-    public function __construct(private GoogleRoutesService $routes, private DeliveryTierService $tiers) {}
+    public function __construct(private OpenRouteService $routes, private DeliveryTierService $tiers) {}
 
     public function quote(string $latitude, string $longitude): DeliveryQuote
     {

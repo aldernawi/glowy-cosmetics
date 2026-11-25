@@ -1,25 +1,6 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
-
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
+<x-guest-layout title="استعادة كلمة المرور | Glowy">
+    <div class="mb-8"><p class="text-sm font-bold text-glowy-rose-deep">نساعدكِ ✦</p><h1 class="mt-3 font-display text-3xl font-bold text-glowy-plum">نسيتِ كلمة المرور؟</h1><p class="mt-3 leading-7 text-glowy-muted">أدخلي بريدكِ وسنرسل لكِ رابطًا آمنًا لتعيين كلمة مرور جديدة.</p></div>
+    @if(session('status'))<p class="mb-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-800">{{ session('status') }}</p>@endif
+    <form method="POST" action="{{ route('password.email') }}" class="space-y-5">@csrf<div><label for="email" class="mb-2 block text-sm font-bold text-glowy-plum">البريد الإلكتروني</label><input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('email')" class="mt-2" /></div><button type="submit" class="flex min-h-12 w-full items-center justify-center rounded-full bg-glowy-rose-deep px-6 font-bold text-white transition hover:bg-glowy-plum">إرسال رابط الاستعادة</button></form>
+    <p class="mt-7 text-center text-sm text-glowy-muted"><a href="{{ route('login') }}" class="font-bold text-glowy-rose-deep">← العودة لتسجيل الدخول</a></p>
 </x-guest-layout>

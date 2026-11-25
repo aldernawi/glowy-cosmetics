@@ -1,17 +1,1 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    {{ __("You're logged in!") }}
-                </div>
-            </div>
-        </div>
-    </div>
-</x-app-layout>
+<x-layouts.storefront title="حسابي | Glowy"><section class="mx-auto max-w-5xl px-5 py-12 sm:px-8"><p class="section-eyebrow">مرحبًا {{ auth()->user()->name }}</p><h1 class="section-title">حسابي</h1><div class="mt-8 grid gap-5 md:grid-cols-3"><a href="{{route('customer.orders.index')}}" class="rounded-3xl border border-glowy-champagne bg-white p-6 transition hover:-translate-y-1"><p class="text-sm text-glowy-muted">طلباتي</p><p class="mt-3 text-3xl font-bold text-glowy-plum">{{$ordersCount}}</p><span class="mt-4 inline-block text-sm font-bold text-glowy-rose">عرض الطلبات ←</span></a><a href="{{route('profile.edit')}}" class="rounded-3xl border border-glowy-champagne bg-white p-6 transition hover:-translate-y-1"><p class="text-sm text-glowy-muted">بياناتي</p><p class="mt-3 text-xl font-bold text-glowy-plum">الملف الشخصي</p><span class="mt-4 inline-block text-sm font-bold text-glowy-rose">تحديث الحساب ←</span></a><form method="POST" action="{{route('logout')}}" class="rounded-3xl bg-glowy-blush p-6">@csrf<p class="text-sm text-glowy-muted">الجلسة</p><p class="mt-3 text-xl font-bold text-glowy-plum">تسجيل الخروج</p><button class="mt-4 text-sm font-bold text-glowy-rose">خروج آمن ←</button></form></div><section class="mt-8 rounded-3xl border border-glowy-champagne bg-white p-6"><h2 class="font-display text-xl font-bold">آخر الطلبات</h2><div class="mt-4 divide-y divide-glowy-champagne">@forelse($recentOrders as $order)<a href="{{route('customer.orders.show',$order)}}" class="flex items-center justify-between py-3 text-sm"><span dir="ltr" class="font-bold text-glowy-rose">{{$order->number}}</span><span>{{$order->status->label()}}</span><strong>{{$order->total}} د.ل</strong></a>@empty<p class="py-5 text-sm text-glowy-muted">لا توجد طلبات بعد. اكتشفي منتجاتك المفضلة وابدئي أول طلب.</p>@endforelse</div></section></section></x-layouts.storefront>

@@ -32,6 +32,32 @@ class CartItemManagementTest extends TestCase
         $this->assertDatabaseHas('cart_items', ['product_variant_id' => $variant->id, 'quantity' => 2]);
     }
 
+    public function test_cart_addition_returns_the_updated_count_for_an_ajax_request(): void
+    {
+        $variant = Product::query()->create(['name_ar' => 'مرطب فوري', 'slug' => 'instant-moisturizer'])
+            ->createDefaultVariant('AJAX-CART-1', '11.000');
+        $variant->update(['stock_quantity' => 3]);
+
+        $this->postJson(route('cart.items.store'), [
+            'product_variant_id' => $variant->id,
+            'quantity' => 1,
+        ])->assertOk()
+            ->assertJsonPath('message', 'تمت إضافة المنتج إلى سلتك.')
+            ->assertJsonPath('cart_count', 1);
+    }
+
+    public function test_cart_addition_returns_a_json_stock_error_for_an_ajax_request(): void
+    {
+        $variant = Product::query()->create(['name_ar' => 'منتج نافد', 'slug' => 'sold-out-product'])
+            ->createDefaultVariant('AJAX-CART-OUT', '11.000');
+
+        $this->postJson(route('cart.items.store'), [
+            'product_variant_id' => $variant->id,
+            'quantity' => 1,
+        ])->assertUnprocessable()
+            ->assertJsonPath('message', 'الكمية المطلوبة غير متوفرة حاليًا.');
+    }
+
     public function test_customer_can_update_and_remove_only_items_in_their_cart(): void
     {
         $variant = Product::query()->create(['name_ar' => 'مرطب', 'slug' => 'moisturizer'])

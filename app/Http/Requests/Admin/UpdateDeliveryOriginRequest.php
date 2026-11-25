@@ -8,7 +8,7 @@ class UpdateDeliveryOriginRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('admin.access') ?? false;
+        return $this->user()?->canAny(['admin.access', 'delivery.manage']) ?? false;
     }
 
     public function rules(): array

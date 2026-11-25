@@ -1,31 +1,5 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-    </div>
-
-    @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </div>
-    @endif
-
-    <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
-            </div>
-        </form>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Log Out') }}
-            </button>
-        </form>
-    </div>
+<x-guest-layout title="تأكيد البريد الإلكتروني | Glowy">
+    <div class="mb-8"><p class="text-sm font-bold text-glowy-rose-deep">بقيت خطوة واحدة ✦</p><h1 class="mt-3 font-display text-3xl font-bold text-glowy-plum">أكّدي بريدكِ الإلكتروني</h1><p class="mt-3 leading-7 text-glowy-muted">أرسلنا رابط التأكيد إلى بريدكِ. افتحيه لتفعيل حساب Glowy.</p></div>
+    @if(session('status') === 'verification-link-sent')<p class="mb-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-800">أرسلنا رابط تأكيد جديدًا إلى بريدكِ الإلكتروني.</p>@endif
+    <div class="grid gap-3"><form method="POST" action="{{ route('verification.send') }}">@csrf<button class="flex min-h-12 w-full items-center justify-center rounded-full bg-glowy-rose-deep px-6 font-bold text-white transition hover:bg-glowy-plum">إعادة إرسال رابط التأكيد</button></form><form method="POST" action="{{ route('logout') }}">@csrf<button class="w-full py-3 text-sm font-bold text-glowy-rose-deep">تسجيل الخروج</button></form></div>
 </x-guest-layout>

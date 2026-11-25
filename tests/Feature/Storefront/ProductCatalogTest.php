@@ -60,4 +60,21 @@ class ProductCatalogTest extends TestCase
         $this->get(route('products.show', $product))->assertOk()
             ->assertDontSee('الفوائد')->assertDontSee('طريقة الاستخدام')->assertDontSee('تنبيهات')->assertDontSee('المكونات البارزة');
     }
+
+    public function test_catalog_cards_add_a_single_sellable_variant_to_the_cart_and_link_multi_variant_products_to_their_choices(): void
+    {
+        $single = Product::query()->create(['name_ar' => 'غسول سريع', 'slug' => 'quick-cleanser']);
+        $singleVariant = $single->createDefaultVariant('QUICK-1', '14.000');
+        $singleVariant->update(['stock_quantity' => 2]);
+
+        $multiple = Product::query()->create(['name_ar' => 'سيروم متعدد الأحجام', 'slug' => 'multi-serum']);
+        $multiple->createDefaultVariant('MULTI-1', '20.000')->update(['stock_quantity' => 2]);
+        $multiple->variants()->create(['sku' => 'MULTI-2', 'name' => '60 مل', 'price' => '30.000', 'stock_quantity' => 2, 'is_active' => true]);
+
+        $this->get(route('products.index'))
+            ->assertOk()
+            ->assertSee('أضيفي إلى السلة')
+            ->assertSee('product_variant_id" value="'.$singleVariant->id.'"', false)
+            ->assertSee('اختاري الحجم');
+    }
 }

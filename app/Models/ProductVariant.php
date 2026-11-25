@@ -26,6 +26,11 @@ class ProductVariant extends Model
         return $this->hasMany(StockMovement::class);
     }
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     public function isOnSale(): bool
     {
         return $this->compare_at_price !== null

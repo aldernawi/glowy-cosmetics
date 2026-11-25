@@ -43,7 +43,7 @@ php artisan config:cache
 php artisan view:cache
 ```
 
-مفاتيح Google Maps وGoogle Routes تبقى في `.env` فقط، مع تقييد مفتاح المتصفح بالنطاقات المسموحة ومفتاح Routes على الخادم.
+الخريطة تستخدم Leaflet وOpenStreetMap بلا مفتاح متصفح. أضف `OPENROUTESERVICE_API_KEY` فقط في `.env` لحساب مسافة القيادة من الخادم، واحفظه خارج Git. البحث المجاني عن المواقع عبر Nominatim محدود ومقصود للبحث اليدوي، وليس الإكمال التلقائي عند كل ضغطة.
 
 ## الإدارة والإطلاق
 

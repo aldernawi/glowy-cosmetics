@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AdminAccessTest extends TestCase
@@ -35,5 +36,27 @@ class AdminAccessTest extends TestCase
             ->get(route('admin.dashboard'))
             ->assertOk()
             ->assertSee('لوحة التحكم');
+    }
+
+    public function test_catalog_manager_can_manage_catalog_but_cannot_access_operational_administration(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $manager = User::factory()->create();
+        $manager->assignRole(Role::findByName('catalog-manager'));
+
+        $this->actingAs($manager)->get(route('admin.products.index'))->assertOk();
+        $this->actingAs($manager)->get(route('admin.orders.index'))->assertForbidden();
+        $this->actingAs($manager)->get(route('admin.users.index'))->assertForbidden();
+    }
+
+    public function test_a_granular_catalog_permission_does_not_grant_product_changes(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $viewer = User::factory()->create();
+        $viewer->givePermissionTo('products.view');
+
+        $this->actingAs($viewer)->get(route('admin.products.index'))->assertOk();
+        $this->actingAs($viewer)->get(route('admin.products.create'))->assertForbidden();
+        $this->actingAs($viewer)->get(route('admin.orders.index'))->assertForbidden();
     }
 }

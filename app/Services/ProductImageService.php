@@ -12,9 +12,11 @@ use Illuminate\Validation\ValidationException;
 
 class ProductImageService
 {
+    private const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'];
+
     public function store(Product $product, UploadedFile $file, ?string $alt): ProductImage
     {
-        $path = $this->storeWebp($file, "products/{$product->id}");
+        $path = $this->storeOriginal($file, "products/{$product->id}");
         try {
             return DB::transaction(fn () => $product->images()->create([
                 'path' => $path,
@@ -28,33 +30,39 @@ class ProductImageService
         }
     }
 
-    public function storeWebp(UploadedFile $file, string $directory): string
+    public function storeOriginal(UploadedFile $file, string $directory): string
     {
-        $contents = file_get_contents($file->getRealPath());
-        $source = $contents === false ? false : imagecreatefromstring($contents);
-        if ($source === false) {
-            throw ValidationException::withMessages(['image' => 'تعذر معالجة الصورة المرفوعة.']);
+        $extension = strtolower($file->getClientOriginalExtension());
+
+        if (! in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+            throw ValidationException::withMessages([
+                'image' => 'صيغة الصورة غير مدعومة. استخدمي JPG أو PNG أو WEBP أو GIF أو AVIF.',
+            ]);
         }
-        $width = imagesx($source);
-        $height = imagesy($source);
-        if ($width > 1600) {
-            $resized = imagescale($source, 1600, (int) round($height * (1600 / $width)), IMG_BICUBIC_FIXED);
-            imagedestroy($source);
-            $source = $resized;
+
+        $filename = Str::uuid().'.'.$extension;
+        $path = trim($directory, '/').'/'.$filename;
+
+        if (Storage::disk('public')->putFileAs(trim($directory, '/'), $file, $filename) === false) {
+            throw ValidationException::withMessages([
+                'image' => 'تعذر حفظ الصورة المرفوعة. حاولي مرة أخرى.',
+            ]);
         }
-        imagepalettetotruecolor($source);
-        imagealphablending($source, true);
-        imagesavealpha($source, true);
-        ob_start();
-        imagewebp($source, null, 86);
-        $webp = ob_get_clean();
-        imagedestroy($source);
-        if (! is_string($webp) || $webp === '') {
-            throw ValidationException::withMessages(['image' => 'تعذر تحسين الصورة المرفوعة.']);
-        }
-        $path = trim($directory, '/').'/'.Str::uuid().'.webp';
-        Storage::disk('public')->put($path, $webp);
 
         return $path;
+    }
+
+    public function move(ProductImage $image, string $direction): void
+    {
+        DB::transaction(function () use ($image, $direction): void {
+            $images = ProductImage::query()->where('product_id', $image->product_id)->orderBy('sort_order')->orderBy('id')->lockForUpdate()->get()->values();
+            $index = $images->search(fn (ProductImage $candidate) => $candidate->is($image));
+            $target = $direction === 'up' ? $index - 1 : $index + 1;
+            if (! is_int($index) || ! isset($images[$target])) {
+                return;
+            }
+            [$images[$index], $images[$target]] = [$images[$target], $images[$index]];
+            $images->each(fn (ProductImage $candidate, int $position) => $candidate->update(['sort_order' => $position]));
+        });
     }
 }

@@ -17,7 +17,7 @@
                 </h1>
                 <p class="mt-8 max-w-xl text-lg leading-9 text-glowy-muted">{{ $content['hero_subtitle'] }}</p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('products.index') }}" class="glowy-button glowy-button--primary">{{ $content['hero_cta_label'] }} <span aria-hidden="true">←</span></a>
+                    <a href="{{ $content['hero_cta_url'] ?: route('products.index') }}" class="glowy-button glowy-button--primary">{{ $content['hero_cta_label'] }} <span aria-hidden="true">←</span></a>
                     <a href="#routine" class="glowy-button glowy-button--secondary">اكتشفي روتينك</a>
                 </div>
                 <div class="mt-9 flex flex-wrap items-center gap-x-7 gap-y-3 text-sm font-bold text-glowy-plum/75">
@@ -59,7 +59,8 @@
         </div>
     </div>
 
-    <section class="relative mx-auto max-w-7xl overflow-hidden px-5 py-20 sm:px-8">
+    <div class="flex flex-col">
+    @if($sections['concerns']['is_visible'])<section class="relative mx-auto max-w-7xl overflow-hidden px-5 py-20 sm:px-8" style="order: {{ $sections['concerns']['sort_order'] }}">
         <div class="mb-10 flex flex-wrap items-end justify-between gap-4" data-reveal>
             <div><p class="section-eyebrow">ابدئي من احتياجك</p><h2 class="section-title">تسوّقي حسب احتياج بشرتك</h2></div>
             <a href="{{ route('products.index') }}" class="section-link">شاهدي كل الاختيارات <span aria-hidden="true">←</span></a>
@@ -77,9 +78,9 @@
                 <p class="text-glowy-muted">ستظهر احتياجات البشرة هنا بعد إضافتها.</p>
             @endforelse
         </div>
-    </section>
+    </section>@endif
 
-    <section class="relative overflow-hidden bg-white py-20">
+    @if($sections['categories']['is_visible'])<section class="relative overflow-hidden bg-white py-20" style="order: {{ $sections['categories']['sort_order'] }}">
         <span class="absolute -start-12 top-10 text-8xl text-glowy-blush" aria-hidden="true">✦</span>
         <div class="mx-auto max-w-7xl px-5 sm:px-8">
             <div class="mb-10 flex items-end justify-between gap-4" data-reveal>
@@ -91,7 +92,7 @@
                     <a href="{{ route('products.index', ['category' => $category->slug]) }}" class="category-card group relative overflow-hidden rounded-[2rem] bg-glowy-blush" data-reveal style="--reveal-delay: {{ $loop->index * 70 }}ms">
                         <div class="aspect-[4/3] overflow-hidden p-5">
                             @if($category->image_path)
-                                <img src="{{ $category->image_path }}" alt="{{ $category->name_ar }}" class="h-full w-full object-contain transition duration-700 group-hover:scale-110" loading="lazy" decoding="async">
+                                <img src="{{ \Illuminate\Support\Str::startsWith($category->image_path, ['http://', 'https://', '/']) ? $category->image_path : Storage::disk('public')->url($category->image_path) }}" alt="{{ $category->name_ar }}" class="h-full w-full object-contain transition duration-700 group-hover:scale-110" loading="lazy" decoding="async">
                             @else
                                 <div class="flex h-full items-center justify-center text-6xl text-glowy-rose transition duration-700 group-hover:rotate-12 group-hover:scale-110">✦</div>
                             @endif
@@ -106,10 +107,10 @@
                 @endforelse
             </div>
         </div>
-    </section>
+    </section>@endif
 
-    @foreach ([['title' => 'وصل حديثًا', 'caption' => 'اختيارات جديدة تستحق التجربة', 'items' => $newProducts], ['title' => 'الأكثر طلبًا', 'caption' => 'مفضلات عميلات Glowy', 'items' => $bestSellers]] as $section)
-        <section class="mx-auto max-w-7xl px-5 py-20 sm:px-8">
+    @foreach ([['key' => 'new_arrivals', 'title' => 'وصل حديثًا', 'caption' => 'اختيارات جديدة تستحق التجربة', 'items' => $newProducts], ['key' => 'best_sellers', 'title' => 'الأكثر طلبًا', 'caption' => 'مفضلات عميلات Glowy', 'items' => $bestSellers]] as $section)
+        @if($sections[$section['key']]['is_visible'])<section class="mx-auto max-w-7xl px-5 py-20 sm:px-8" style="order: {{ $sections[$section['key']]['sort_order'] }}">
             <div class="mb-10 flex items-end justify-between gap-4" data-reveal>
                 <div><p class="section-eyebrow">{{ $section['caption'] }}</p><h2 class="section-title">{{ $section['title'] }}</h2></div>
                 <a href="{{ route('products.index') }}" class="section-link">كل المنتجات <span aria-hidden="true">←</span></a>
@@ -121,10 +122,10 @@
                     <p class="text-glowy-muted sm:col-span-2 lg:col-span-4">نحضّر لك اختيارات جميلة قريبًا.</p>
                 @endforelse
             </div>
-        </section>
+        </section>@endif
     @endforeach
 
-    <section class="mx-auto max-w-7xl px-5 py-10 sm:px-8">
+    @if($sections['promotion']['is_visible'])<section class="mx-auto max-w-7xl px-5 py-10 sm:px-8" style="order: {{ $sections['promotion']['sort_order'] }}">
         <div class="promo-editorial relative isolate grid overflow-hidden rounded-[2.5rem] bg-glowy-plum text-white shadow-[0_30px_80px_rgba(58,47,51,.14)] lg:grid-cols-[1.1fr_.9fr]" data-reveal data-parallax-scene>
             <span class="absolute -end-16 -top-16 h-52 w-52 rounded-full border border-white/10" aria-hidden="true"></span>
             <span class="absolute end-16 top-10 text-4xl text-glowy-champagne/70" data-parallax data-parallax-depth=".8" aria-hidden="true">✦</span>
@@ -132,7 +133,7 @@
                 <p class="text-sm font-bold text-glowy-champagne">اختيار الأسبوع</p>
                 <h2 class="mt-3 max-w-lg font-display text-3xl font-bold leading-tight sm:text-4xl">{{ $content['promo_title'] }}</h2>
                 <p class="mt-5 max-w-xl leading-8 text-white/75">{{ $content['promo_body'] }}</p>
-                <a href="{{ route('products.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-glowy-plum transition hover:-translate-y-1 hover:bg-glowy-blush">{{ $content['promo_cta_label'] }} <span aria-hidden="true">←</span></a>
+                <a href="{{ $content['promo_cta_url'] ?: route('products.index') }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 font-bold text-glowy-plum transition hover:-translate-y-1 hover:bg-glowy-blush">{{ $content['promo_cta_label'] }} <span aria-hidden="true">←</span></a>
             </div>
             <div class="relative min-h-72 overflow-hidden bg-glowy-champagne/10">
                 <div class="absolute inset-8 rounded-[45%_55%_42%_58%/56%_44%_56%_44%] border border-white/15" aria-hidden="true"></div>
@@ -140,9 +141,13 @@
                 <span class="absolute bottom-8 end-10 rounded-full bg-white/10 px-4 py-2 text-sm font-bold backdrop-blur">4 خطوات. وهج واحد.</span>
             </div>
         </div>
-    </section>
+    </section>@endif
 
-    <section class="bg-white py-20">
+    @if($sections['banners']['is_visible'] && $banners->isNotEmpty())<section class="mx-auto grid max-w-7xl gap-5 px-5 py-10 sm:px-8 lg:grid-cols-2" style="order: {{ $sections['banners']['sort_order'] }}">
+        @foreach($banners as $banner)<article class="relative isolate overflow-hidden rounded-[2rem] bg-glowy-plum p-7 text-white shadow-[0_20px_55px_rgba(58,47,51,.14)] sm:p-9"><div class="relative z-10 max-w-md"><p class="text-sm font-bold text-glowy-champagne">اختيار Glowy</p><h2 class="mt-3 font-display text-2xl font-bold">{{ $banner->title }}</h2>@if($banner->body)<p class="mt-3 leading-7 text-white/75">{{ $banner->body }}</p>@endif@if($banner->cta_label && $banner->cta_url)<a href="{{ $banner->cta_url }}" class="mt-6 inline-flex rounded-full bg-white px-5 py-3 text-sm font-bold text-glowy-plum">{{ $banner->cta_label }} ←</a>@endif</div>@if($banner->image_path)<img src="{{ Storage::disk('public')->url($banner->image_path) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover opacity-35">@endif</article>@endforeach
+    </section>@endif
+
+    @if($sections['brands']['is_visible'])<section class="bg-white py-20" style="order: {{ $sections['brands']['sort_order'] }}">
         <div class="mx-auto max-w-7xl px-5 sm:px-8">
             <div class="mb-10" data-reveal><p class="section-eyebrow">أسماء مختارة بعناية</p><h2 class="section-title">ماركات نثق بها</h2></div>
             <div class="flex flex-wrap gap-3">
@@ -153,9 +158,9 @@
                 @endforelse
             </div>
         </div>
-    </section>
+    </section>@endif
 
-    <section id="routine" class="relative overflow-hidden py-20">
+    @if($sections['routine']['is_visible'])<section id="routine" class="relative overflow-hidden py-20" style="order: {{ $sections['routine']['sort_order'] }}">
         <div class="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:gap-16">
             <div class="relative" data-reveal>
                 <div class="overflow-hidden rounded-[3rem_3rem_3rem_8rem] bg-glowy-blush shadow-[0_24px_70px_rgba(58,47,51,.12)]">
@@ -190,9 +195,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section>@endif
 
-    <section class="relative overflow-hidden bg-glowy-blush py-20">
+    @if($sections['why_glowy']['is_visible'])<section class="relative overflow-hidden bg-glowy-blush py-20" style="order: {{ $sections['why_glowy']['sort_order'] }}">
         <span class="absolute end-[8%] top-8 text-5xl text-white" aria-hidden="true">✦</span>
         <div class="mx-auto max-w-7xl px-5 sm:px-8">
             <div class="text-center" data-reveal><p class="section-eyebrow">ثقة في كل اختيار</p><h2 class="section-title">لماذا Glowy؟</h2></div>
@@ -206,5 +211,6 @@
                 @endforeach
             </div>
         </div>
-    </section>
+    </section>@endif
+    </div>
 </x-layouts.storefront>

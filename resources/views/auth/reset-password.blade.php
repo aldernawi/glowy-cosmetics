@@ -1,39 +1,4 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
-
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
+<x-guest-layout title="كلمة مرور جديدة | Glowy">
+    <div class="mb-8"><p class="text-sm font-bold text-glowy-rose-deep">خطوة أخيرة ✦</p><h1 class="mt-3 font-display text-3xl font-bold text-glowy-plum">عيّني كلمة مرور جديدة</h1><p class="mt-3 leading-7 text-glowy-muted">اختاري كلمة مرور قوية يسهل عليكِ تذكرها.</p></div>
+    <form method="POST" action="{{ route('password.store') }}" class="space-y-5">@csrf<input type="hidden" name="token" value="{{ $request->route('token') }}"><div><label for="email" class="mb-2 block text-sm font-bold text-glowy-plum">البريد الإلكتروني</label><input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('email')" class="mt-2" /></div><div><label for="password" class="mb-2 block text-sm font-bold text-glowy-plum">كلمة المرور الجديدة</label><input id="password" type="password" name="password" required autocomplete="new-password" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('password')" class="mt-2" /></div><div><label for="password_confirmation" class="mb-2 block text-sm font-bold text-glowy-plum">تأكيد كلمة المرور</label><input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" /></div><button type="submit" class="flex min-h-12 w-full items-center justify-center rounded-full bg-glowy-rose-deep px-6 font-bold text-white transition hover:bg-glowy-plum">حفظ كلمة المرور</button></form>
 </x-guest-layout>

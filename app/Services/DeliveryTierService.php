@@ -50,11 +50,17 @@ class DeliveryTierService
 
         $tier = $this->activeTiers()->first(fn (DeliveryTier $tier): bool => $distance->isLessThanOrEqualTo(BigDecimal::of($tier->max_distance_km)));
 
-        if ($tier === null) {
-            throw new DomainException('The destination is outside the delivery range.');
+        if ($tier !== null) {
+            return $tier;
         }
 
-        return $tier;
+        $nearestTier = $this->activeTiers()->last();
+
+        if ($nearestTier === null) {
+            throw new DomainException('No active delivery tiers are configured.');
+        }
+
+        return $nearestTier;
     }
 
     /** @return Collection<int, DeliveryTier> */

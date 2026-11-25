@@ -24,12 +24,22 @@ class OrderController extends Controller
             $orders->where('payment_status', $request->string('payment_status')->toString());
         }
 
-        return view('admin.orders.index', ['orders' => $orders->paginate(25)->withQueryString()]);
+        if ($request->filled('q')) {
+            $orders->where(fn ($query) => $query->where('number', 'like', '%'.$request->string('q').'%')->orWhere('customer_name', 'like', '%'.$request->string('q').'%')->orWhere('phone', 'like', '%'.$request->string('q').'%'));
+        }
+        if ($request->filled('from')) {
+            $orders->whereDate('created_at', '>=', $request->date('from'));
+        }
+        if ($request->filled('to')) {
+            $orders->whereDate('created_at', '<=', $request->date('to'));
+        }
+
+        return view('admin.orders.index', ['orders' => $orders->paginate(25)->withQueryString(), 'statuses' => OrderStatus::cases()]);
     }
 
-    public function show(Order $order): View
+    public function show(Order $order, OrderService $orders): View
     {
-        return view('admin.orders.show', ['order' => $order->load('items.productVariant')]);
+        return view('admin.orders.show', ['order' => $order->load(['items.productVariant', 'statusHistory.user']), 'nextStatuses' => $orders->nextStatuses($order)]);
     }
 
     public function print(Order $order): View

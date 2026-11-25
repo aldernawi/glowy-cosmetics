@@ -92,7 +92,9 @@ class TaxonomyController extends Controller
 
     private function update(StoreTaxonomyRequest $request, Model $item, string $route): RedirectResponse
     {
-        $item->update($request->validated() + ['is_active' => $request->boolean('is_active')]);
+        $validated = $request->validated();
+        validator($validated, ['slug' => [Rule::unique($item->getTable(), 'slug')->ignore($item)]])->validate();
+        $item->update($validated + ['is_active' => $request->boolean('is_active')]);
 
         return to_route("admin.{$route}.index");
     }

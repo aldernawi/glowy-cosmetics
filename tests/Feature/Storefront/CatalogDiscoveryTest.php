@@ -38,6 +38,15 @@ class CatalogDiscoveryTest extends TestCase
         $this->get(route('concerns.show', $concern))->assertOk()->assertSee('الجفاف');
     }
 
+    public function test_brand_logos_use_a_relative_public_storage_url(): void
+    {
+        Brand::query()->create(['name_ar' => 'ماركة مرئية', 'slug' => 'visible-brand', 'logo_path' => 'brands/logo.webp']);
+
+        $this->get(route('brands.index'))
+            ->assertOk()
+            ->assertSee('src="/storage/brands/logo.webp"', false);
+    }
+
     public function test_search_includes_concerns_and_price_bounds_apply_to_the_same_active_variant(): void
     {
         $concern = Concern::query()->create(['name_ar' => 'التصبغات', 'slug' => 'pigmentation']);

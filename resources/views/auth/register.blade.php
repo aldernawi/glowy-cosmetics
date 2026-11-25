@@ -1,52 +1,11 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
-
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
-
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
+<x-guest-layout title="إنشاء حساب | Glowy">
+    <div class="mb-8"><p class="text-sm font-bold text-glowy-rose-deep">مرحبًا بكِ ✦</p><h1 class="mt-3 font-display text-3xl font-bold text-glowy-plum">أنشئي حسابكِ</h1><p class="mt-3 leading-7 text-glowy-muted">احفظي بياناتكِ وتابعي طلباتكِ بسهولة.</p></div>
+    <form method="POST" action="{{ route('register') }}" class="space-y-5">@csrf
+        <div><label for="name" class="mb-2 block text-sm font-bold text-glowy-plum">الاسم</label><input id="name" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('name')" class="mt-2" /></div>
+        <div><label for="email" class="mb-2 block text-sm font-bold text-glowy-plum">البريد الإلكتروني</label><input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('email')" class="mt-2" /></div>
+        <div><label for="password" class="mb-2 block text-sm font-bold text-glowy-plum">كلمة المرور</label><input id="password" type="password" name="password" required autocomplete="new-password" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('password')" class="mt-2" /></div>
+        <div><label for="password_confirmation" class="mb-2 block text-sm font-bold text-glowy-plum">تأكيد كلمة المرور</label><input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" dir="ltr" class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" /></div>
+        <button type="submit" class="flex min-h-12 w-full items-center justify-center rounded-full bg-glowy-rose-deep px-6 font-bold text-white transition hover:-translate-y-0.5 hover:bg-glowy-plum">إنشاء الحساب ←</button>
     </form>
+    <p class="mt-8 border-t border-glowy-champagne pt-5 text-center text-sm text-glowy-muted">لديكِ حساب؟ <a href="{{ route('login') }}" class="font-bold text-glowy-rose-deep">سجّلي الدخول</a></p>
 </x-guest-layout>

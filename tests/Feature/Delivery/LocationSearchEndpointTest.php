@@ -1,0 +1,28 @@
+<?php
+
+namespace Tests\Feature\Delivery;
+
+use Illuminate\Support\Facades\Http;
+use Tests\TestCase;
+
+class LocationSearchEndpointTest extends TestCase
+{
+    public function test_it_returns_a_reverse_lookup_for_a_selected_map_point(): void
+    {
+        Http::fake(['nominatim.openstreetmap.org/*' => Http::response([
+            'lat' => '32.8872000', 'lon' => '13.1913000', 'display_name' => 'الظهرة، طرابلس، ليبيا', 'place_id' => 456,
+        ])]);
+
+        $this->getJson(route('locations.reverse', ['latitude' => '32.8872000', 'longitude' => '13.1913000']))
+            ->assertOk()
+            ->assertJsonPath('result.place_id', 'osm-456')
+            ->assertJsonPath('result.address', 'الظهرة، طرابلس، ليبيا');
+    }
+
+    public function test_it_rejects_invalid_reverse_lookup_coordinates(): void
+    {
+        $this->getJson(route('locations.reverse', ['latitude' => '91', 'longitude' => '13.1913000']))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('latitude');
+    }
+}

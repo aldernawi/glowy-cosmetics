@@ -8,7 +8,7 @@ class UpdateHomepageContentRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('admin.access') ?? false;
+        return $this->user()?->canAny(['admin.access', 'content.manage']) ?? false;
     }
 
     public function rules(): array
@@ -17,11 +17,21 @@ class UpdateHomepageContentRequest extends FormRequest
             'hero_title' => ['required', 'string', 'max:120'],
             'hero_subtitle' => ['required', 'string', 'max:500'],
             'hero_cta_label' => ['required', 'string', 'max:40'],
-            'hero_image' => ['nullable', 'image', 'max:5120'],
+            'hero_cta_url' => ['nullable', 'string', 'max:255', function (string $attribute, mixed $value, \Closure $fail): void {
+                if ($value && ! str_starts_with($value, '/') && filter_var($value, FILTER_VALIDATE_URL) === false) {
+                    $fail('رابط زر Hero يجب أن يكون رابطًا كاملاً أو مسارًا يبدأ بـ /.');
+                }
+            }],
+            'hero_image' => ['nullable', 'file', 'extensions:jpg,jpeg,png,webp,gif,avif', 'max:10240'],
             'announcement' => ['nullable', 'string', 'max:180'],
             'promo_title' => ['sometimes', 'required', 'string', 'max:120'],
             'promo_body' => ['sometimes', 'required', 'string', 'max:500'],
             'promo_cta_label' => ['sometimes', 'required', 'string', 'max:40'],
+            'promo_cta_url' => ['nullable', 'string', 'max:255', function (string $attribute, mixed $value, \Closure $fail): void {
+                if ($value && ! str_starts_with($value, '/') && filter_var($value, FILTER_VALIDATE_URL) === false) {
+                    $fail('رابط زر البانر يجب أن يكون رابطًا كاملاً أو مسارًا يبدأ بـ /.');
+                }
+            }],
             'phone' => ['nullable', 'string', 'max:40'],
             'whatsapp' => ['nullable', 'regex:/^[0-9]{8,20}$/'],
             'email' => ['nullable', 'email'],

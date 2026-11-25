@@ -25,6 +25,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+        @stack('head')
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="storefront-shell min-h-screen overflow-x-hidden bg-glowy-ivory font-sans text-glowy-ink antialiased" x-data="{ menuOpen: false, cartOpen: false }">
@@ -38,18 +39,19 @@
                 <a href="{{ route('home') }}" class="block" aria-label="Glowy الرئيسية"><img src="{{ asset('images/glowy-logo.png') }}" alt="Glowy" class="h-auto w-32 sm:w-40" data-site-logo></a>
                 <nav class="hidden items-center gap-5 text-sm font-bold lg:flex" aria-label="التنقل الرئيسي">
                     <a class="transition hover:text-glowy-rose" href="{{ route('home') }}">الرئيسية</a>
-                    <a class="transition hover:text-glowy-rose" href="{{ route('products.index') }}">المنتجات</a>
-                    @if($headerSunscreenCategory)<a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['category' => $headerSunscreenCategory->slug]) }}">واقي الشمس</a>@endif
+                    @foreach($headerCategories as $category)<a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['category' => $category->slug]) }}">{{ $category->name_ar }}</a>@endforeach
+                    <details class="group relative"><summary class="cursor-pointer list-none transition hover:text-glowy-rose">احتياجات البشرة</summary><div class="absolute start-0 top-7 z-20 grid w-52 gap-2 rounded-2xl border border-glowy-champagne bg-white p-3 shadow-lg">@foreach($headerConcerns as $concern)<a class="text-sm font-medium hover:text-glowy-rose" href="{{route('concerns.show',$concern)}}">{{$concern->name_ar}}</a>@endforeach</div></details>
+                    <a class="transition hover:text-glowy-rose" href="{{ route('brands.index') }}">الماركات</a>
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a>
                     <a class="transition hover:text-glowy-rose" href="{{ route('products.index', ['sale' => 1]) }}">العروض</a>
                 </nav>
                 <div class="flex items-center gap-1 sm:gap-2">
                     <a href="{{ route('products.index') }}" class="rounded-full p-2 hover:bg-glowy-blush" aria-label="البحث">⌕</a>
                     @auth<a href="{{ route('dashboard') }}" class="hidden rounded-full px-3 py-2 text-sm font-bold hover:bg-glowy-blush sm:block">حسابي</a>@else<a href="{{ route('login') }}" class="hidden rounded-full px-3 py-2 text-sm font-bold hover:bg-glowy-blush sm:block">دخول</a>@endauth
-                    <button type="button" @click="cartOpen = true" class="relative rounded-full bg-glowy-rose px-4 py-2 text-sm font-bold text-white transition hover:bg-glowy-plum" aria-label="فتح سلة التسوق">السلة <span class="ms-1 rounded-full bg-white/20 px-1.5">{{ $headerCartCount }}</span></button>
+                    <button type="button" @click="cartOpen = true" class="relative rounded-full bg-glowy-rose px-4 py-2 text-sm font-bold text-white transition hover:bg-glowy-plum" aria-label="فتح سلة التسوق">السلة <span data-cart-count class="ms-1 rounded-full bg-white/20 px-1.5">{{ $headerCartCount }}</span></button>
                 </div>
             </div>
-            <div x-cloak x-show="menuOpen" x-transition class="border-t border-glowy-champagne bg-white px-5 py-5 lg:hidden"><nav class="grid gap-4 font-bold"><a href="{{ route('home') }}">الرئيسية</a><a href="{{ route('products.index') }}">كل المنتجات</a><a href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a><a href="{{ route('products.index', ['sale' => 1]) }}">العروض</a>@auth<a href="{{ route('dashboard') }}">حسابي</a>@else<a href="{{ route('login') }}">دخول</a>@endauth</nav></div>
+            <div x-cloak x-show="menuOpen" x-transition class="border-t border-glowy-champagne bg-white px-5 py-5 lg:hidden"><nav class="grid gap-4 font-bold"><a href="{{ route('home') }}">الرئيسية</a>@foreach($headerCategories as $category)<a href="{{ route('products.index',['category'=>$category->slug]) }}">{{$category->name_ar}}</a>@endforeach<a href="{{route('brands.index')}}">الماركات</a><a href="{{ route('products.index', ['new' => 1]) }}">وصل حديثًا</a><a href="{{ route('products.index', ['sale' => 1]) }}">العروض</a>@auth<a href="{{ route('dashboard') }}">حسابي</a>@else<a href="{{ route('login') }}">دخول</a>@endauth</nav></div>
             <form method="GET" action="{{ route('products.index') }}" class="mx-auto hidden max-w-7xl px-4 pb-4 md:block sm:px-6 lg:px-8"><label class="sr-only" for="header-search">ابحثي في المتجر</label><input id="header-search" name="q" value="{{ request('q') }}" placeholder="ابحثي عن منتج، ماركة أو احتياج لبشرتك..." class="w-full rounded-full border-glowy-champagne bg-white px-5 text-sm"></form>
         </header>
 
@@ -65,6 +67,7 @@
                 <div class="border-t border-glowy-champagne pt-5"><div class="flex justify-between"><span>المجموع الفرعي</span><strong>{{ $headerCartSubtotal }} د.ل</strong></div><a href="{{ route('cart.index') }}" class="mt-4 flex min-h-12 items-center justify-center rounded-full bg-glowy-rose font-bold text-white">عرض السلة</a></div>
             </aside>
         </div>
+        <div id="cart-feedback" class="pointer-events-none fixed inset-x-4 bottom-5 z-[60] mx-auto hidden max-w-sm rounded-2xl px-5 py-4 text-center text-sm font-bold shadow-lg sm:inset-x-auto sm:start-5" role="status" aria-live="polite"></div>
 
         <main id="main-content">{{ $slot }}</main>
 

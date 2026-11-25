@@ -9,21 +9,34 @@ use App\Models\CartItem;
 use App\Models\ProductVariant;
 use App\Services\CartService;
 use DomainException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class CartItemController extends Controller
 {
-    public function store(StoreCartItemRequest $request, CartService $carts): RedirectResponse
+    public function store(StoreCartItemRequest $request, CartService $carts): JsonResponse|RedirectResponse
     {
         try {
+            $cart = $carts->resolve($request);
             $carts->add(
-                $carts->resolve($request),
+                $cart,
                 ProductVariant::query()->findOrFail($request->integer('product_variant_id')),
                 $request->integer('quantity'),
             );
         } catch (DomainException) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'الكمية المطلوبة غير متوفرة حاليًا.'], 422);
+            }
+
             return to_route('cart.index')->withErrors(['cart' => 'الكمية المطلوبة غير متوفرة حاليًا.']);
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'تمت إضافة المنتج إلى سلتك.',
+                'cart_count' => $cart->items()->sum('quantity'),
+            ]);
         }
 
         return to_route('cart.index')->with('status', 'تمت إضافة المنتج إلى سلتك.');

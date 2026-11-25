@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+    /** @return array<int, OrderStatus> */
+    public function nextStatuses(Order $order): array
+    {
+        return [OrderStatus::Pending->value => [OrderStatus::Confirmed, OrderStatus::Cancelled], OrderStatus::Confirmed->value => [OrderStatus::Preparing, OrderStatus::Cancelled], OrderStatus::Preparing->value => [OrderStatus::Ready, OrderStatus::Cancelled], OrderStatus::Ready->value => [OrderStatus::OutForDelivery, OrderStatus::Cancelled], OrderStatus::OutForDelivery->value => [OrderStatus::Delivered], OrderStatus::Delivered->value => [OrderStatus::Returned]][$order->status->value] ?? [];
+    }
+
     public function transition(Order $order, OrderStatus $status, ?User $actor = null): Order
     {
         return DB::transaction(function () use ($order, $status, $actor): Order {
@@ -18,8 +24,7 @@ class OrderService
             if ($order->status === $status) {
                 return $order;
             }
-            $allowed = [OrderStatus::Pending->value => [OrderStatus::Confirmed, OrderStatus::Cancelled], OrderStatus::Confirmed->value => [OrderStatus::Preparing, OrderStatus::Cancelled], OrderStatus::Preparing->value => [OrderStatus::Ready, OrderStatus::Cancelled], OrderStatus::Ready->value => [OrderStatus::OutForDelivery, OrderStatus::Cancelled], OrderStatus::OutForDelivery->value => [OrderStatus::Delivered], OrderStatus::Delivered->value => [OrderStatus::Returned]];
-            if (! in_array($status, $allowed[$order->status->value] ?? [], true)) {
+            if (! in_array($status, $this->nextStatuses($order), true)) {
                 throw new DomainException('Invalid order status transition.');
             }
             if (in_array($status, [OrderStatus::Cancelled, OrderStatus::Returned], true)) {

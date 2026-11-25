@@ -1,27 +1,4 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
-    </div>
-
-    <form method="POST" action="{{ route('password.confirm') }}">
-        @csrf
-
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
-    </form>
+<x-guest-layout title="تأكيد كلمة المرور | Glowy">
+    <div class="mb-8"><p class="text-sm font-bold text-glowy-rose-deep">لأمان حسابكِ ✦</p><h1 class="mt-3 font-display text-3xl font-bold text-glowy-plum">أكّدي كلمة المرور</h1><p class="mt-3 leading-7 text-glowy-muted">نحتاج تأكيد كلمة المرور قبل متابعة هذه العملية الحساسة.</p></div>
+    <form method="POST" action="{{ route('password.confirm') }}" class="space-y-5">@csrf<div><label for="password" class="mb-2 block text-sm font-bold text-glowy-plum">كلمة المرور</label><input id="password" type="password" name="password" required autocomplete="current-password" dir="ltr" autofocus class="min-h-12 w-full rounded-2xl border-glowy-champagne bg-glowy-ivory px-4 text-left shadow-sm outline-none transition focus:border-glowy-rose focus:ring-2 focus:ring-glowy-rose/15"><x-input-error :messages="$errors->get('password')" class="mt-2" /></div><button type="submit" class="flex min-h-12 w-full items-center justify-center rounded-full bg-glowy-rose-deep px-6 font-bold text-white transition hover:bg-glowy-plum">تأكيد والمتابعة</button></form>
 </x-guest-layout>

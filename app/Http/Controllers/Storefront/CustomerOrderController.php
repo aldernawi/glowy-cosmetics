@@ -26,6 +26,6 @@ class CustomerOrderController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id, 404);
 
-        return view('storefront.orders.show', ['order' => $order->load('items')]);
+        return view('storefront.orders.show', ['order' => $order->load(['items', 'statusHistory'])]);
     }
 }
