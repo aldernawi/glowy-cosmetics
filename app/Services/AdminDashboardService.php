@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Enums\PosSaleStatus;
 use App\Models\Order;
+use App\Models\PosSale;
 use App\Models\ProductVariant;
 use Brick\Math\BigDecimal;
 use Brick\Math\RoundingMode;
@@ -30,6 +32,7 @@ class AdminDashboardService
             'sales_today' => BigDecimal::of((string) $salesToday)->toScale(3, RoundingMode::HalfUp)->__toString(),
             'sales_month' => BigDecimal::of((string) $salesMonth)->toScale(3, RoundingMode::HalfUp)->__toString(),
             'average_order_value' => $deliveredCount > 0 ? BigDecimal::of((string) ((clone $delivered)->sum('total') ?: 0))->dividedBy($deliveredCount, 3, RoundingMode::HalfUp)->__toString() : '0.000',
+            'pos_sales_today' => BigDecimal::of((string) PosSale::query()->where('status', PosSaleStatus::Completed)->whereDate('sold_at', $today)->sum('total'))->toScale(3, RoundingMode::HalfUp)->__toString(),
             'orders_today' => Order::query()->whereDate('created_at', $today)->count(),
             'active_orders' => Order::query()->whereNotIn('status', ['delivered', 'cancelled', 'returned'])->count(),
             'customers_count' => Order::query()->whereNotNull('user_id')->distinct('user_id')->count('user_id'),

@@ -20,6 +20,8 @@ class AdminLandingService
         'admin.brands.index' => ['brands.view'],
         'admin.categories.index' => ['categories.view'],
         'admin.users.index' => ['users.manage'],
+        'admin.pos.sales.index' => ['pos.manage'],
+        'pos.app' => ['pos.use'],
     ];
 
     public function routeFor(User $user): ?string

@@ -13,6 +13,7 @@ class AdminRoleService
     public const ADMINISTRATOR = 'administrator';
 
     public const LABELS = [
+        'cashier' => 'كاشير',
         'catalog-manager' => 'إدارة الكتالوج',
         self::ADMINISTRATOR => 'مسؤول كامل',
     ];

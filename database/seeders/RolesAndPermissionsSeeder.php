@@ -23,11 +23,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'inventory.view', 'inventory.adjust',
             'orders.view', 'orders.update',
             'delivery.manage', 'content.manage', 'reports.view', 'users.manage', 'customers.view',
+            'pos.use', 'pos.manage',
         ] as $name) {
             Permission::findOrCreate($name, 'web');
         }
         $administrator = Role::findOrCreate('administrator', 'web');
         $catalogManager = Role::findOrCreate('catalog-manager', 'web');
+
+        Role::findOrCreate('cashier', 'web')->syncPermissions(['pos.use']);
 
         $administrator->syncPermissions(Permission::query()->pluck('name')->all());
         $catalogManager->syncPermissions([

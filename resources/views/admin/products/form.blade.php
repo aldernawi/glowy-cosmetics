@@ -11,6 +11,7 @@
             <label class="grid gap-2 text-sm font-bold">التصنيف<select name="category_id" class="min-h-11 rounded-xl border-glowy-champagne px-3"><option value="">اختاري التصنيف (اختياري)</option>@foreach ($categories as $category)<option value="{{ $category->id }}" @selected(old('category_id', $product->category_id ?? null) == $category->id)>{{ $category->name_ar }}</option>@endforeach</select></label>
             @unless ($isEditing)
                 <x-ui.input name="sku" label="كود المنتج SKU" :value="old('sku')" placeholder="مثال: GLW-001" dir="ltr" required/>
+                <x-ui.input name="barcode" label="الباركود (اختياري)" :value="old('barcode')" placeholder="امسحيه بالقارئ" dir="ltr" onkeydown="if(event.key==='Enter')event.preventDefault()"/>
                 <x-ui.input name="price" label="السعر (د.ل)" :value="old('price')" inputmode="decimal" dir="ltr" required/>
                 <x-ui.input name="stock_quantity" label="الكمية المتاحة" :value="old('stock_quantity', 0)" type="number" min="0"/>
                 <x-ui.input name="low_stock_threshold" label="تنبيه انخفاض المخزون" :value="old('low_stock_threshold', 5)" type="number" min="0"/>

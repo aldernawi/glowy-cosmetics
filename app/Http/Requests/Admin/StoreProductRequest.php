@@ -22,6 +22,7 @@ class StoreProductRequest extends FormRequest
             'name_en' => ['nullable', 'string', 'max:255'],
             'slug' => ['required', 'alpha_dash', 'max:255', Rule::unique('products', 'slug')],
             'sku' => ['required', 'string', 'max:255', Rule::unique('product_variants', 'sku')],
+            'barcode' => ['nullable', 'string', 'max:64', 'regex:/^[A-Za-z0-9._\-]+$/', Rule::unique('product_variants', 'barcode')],
             'price' => ['required', 'decimal:0,3', 'min:0'],
             'compare_at_price' => ['nullable', 'decimal:0,3', 'gte:price'],
             'default_variant_name' => ['nullable', 'string', 'max:255'],

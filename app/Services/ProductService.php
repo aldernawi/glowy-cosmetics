@@ -41,6 +41,7 @@ class ProductService
 
                 $variant = $product->createDefaultVariant($attributes['sku'], $attributes['price']);
                 $variant->update([
+                    'barcode' => $attributes['barcode'] ?? null,
                     'name' => $attributes['default_variant_name'] ?? null,
                     'size' => $attributes['default_variant_size'] ?? null,
                     'compare_at_price' => $attributes['compare_at_price'] ?? null,

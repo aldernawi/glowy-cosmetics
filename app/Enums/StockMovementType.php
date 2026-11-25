@@ -8,6 +8,7 @@ enum StockMovementType: string
     case Purchase = 'purchase';
     case ManualIn = 'manual_in';
     case OrderSale = 'order_sale';
+    case PosSale = 'pos_sale';
     case Adjustment = 'adjustment';
     case Return = 'return';
     case Damage = 'damage';

@@ -33,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(20)->by('geocoding:'.$request->ip()),
         ]);
 
+        RateLimiter::for('pos', fn (Request $request) => Limit::perMinute(120)->by('pos:'.$request->ip()));
+
         RateLimiter::for('checkout', function (Request $request): array {
             $customer = $request->user()?->getAuthIdentifier() ?? $request->session()->getId();
             $response = function (Request $request, array $headers): Response {

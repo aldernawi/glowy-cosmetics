@@ -53,3 +53,12 @@ php artisan view:cache
 - تعليمات محركات البحث: `/robots.txt`
 
 تُحفظ الصور المرفوعة كما هي بعد التحقق من محتواها داخل `public/storage` مباشرة، لذلك لا تحتاج `php artisan storage:link`. يُفضّل رفع الصور بصيغة WebP أو AVIF. لتغيير مكان الحفظ اضبط `FILESYSTEM_PUBLIC_ROOT`.
+
+## نقطة البيع (الكاشير)
+
+- شاشة الكاشير: `/pos`. تعمل دون إنترنت بعد ربط الجهاز مرة واحدة من `/admin/pos/device`، وتُرفع المبيعات تلقائيًا عند رجوع الاتصال.
+- تحتاج HTTPS في الإنتاج (شرط المتصفح لعمل Service Worker) ومتصفح Chrome أو Edge حديث.
+- المبيعات غير المرفوعة محفوظة في متصفح الجهاز فقط. لا تمسح بيانات المتصفح ولا تستخدم التصفح الخفي قبل رفعها.
+- أي بيع لا يغطيه رصيد النظام يُقبل ويظهر في `/admin/pos/shortages`.
+- للطباعة الحرارية دون نافذة: اجعل الطابعة الافتراضية 80mm وشغّل Chrome بالخيار `--kiosk-printing`.
+- عند تعديل ملفات `public/pos-assets` أو `resources/views/pos/app.blade.php` حدّث `VERSION` في `public/pos-sw.js` (اختبار `PosOfflineShellTest` يعطي القيمة الصحيحة).

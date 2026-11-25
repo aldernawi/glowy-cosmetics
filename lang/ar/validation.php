@@ -161,7 +161,7 @@ return [
 
     'attributes' => [
         'name' => 'الاسم', 'name_ar' => 'الاسم بالعربية', 'name_en' => 'الاسم بالإنجليزية', 'slug' => 'الرابط المختصر', 'email' => 'البريد الإلكتروني', 'password' => 'كلمة المرور', 'current_password' => 'كلمة المرور الحالية',
-        'sku' => 'كود المنتج SKU', 'price' => 'السعر', 'compare_at_price' => 'السعر قبل التخفيض', 'stock_quantity' => 'الكمية المتاحة', 'low_stock_threshold' => 'حد تنبيه المخزون', 'size' => 'الحجم',
+        'sku' => 'كود المنتج SKU', 'barcode' => 'الباركود', 'price' => 'السعر', 'compare_at_price' => 'السعر قبل التخفيض', 'stock_quantity' => 'الكمية المتاحة', 'low_stock_threshold' => 'حد تنبيه المخزون', 'size' => 'الحجم',
         'default_variant_name' => 'اسم الخيار', 'default_variant_size' => 'حجم الخيار', 'brand_id' => 'الماركة', 'category_id' => 'التصنيف', 'parent_id' => 'التصنيف الأب', 'description' => 'الوصف', 'benefits' => 'الفوائد', 'usage' => 'طريقة الاستخدام', 'warnings' => 'التحذيرات',
         'skin_type_ids.*' => 'نوع البشرة', 'concern_ids.*' => 'احتياج البشرة', 'ingredient_ids.*' => 'المكون', 'image' => 'الصورة', 'images' => 'الصور', 'images.*' => 'الصورة', 'logo' => 'الشعار', 'hero_image' => 'الصورة الرئيسية', 'alt' => 'وصف الصورة',
         'is_active' => 'حالة الظهور', 'is_featured' => 'التمييز', 'sort_order' => 'الترتيب', 'website' => 'الموقع الإلكتروني', 'title' => 'العنوان', 'body' => 'النص', 'cta_label' => 'نص الزر', 'cta_url' => 'رابط الزر',

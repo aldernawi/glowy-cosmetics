@@ -9,6 +9,9 @@ use App\Http\Controllers\Admin\DeliverySettingController;
 use App\Http\Controllers\Admin\HomepageContentController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\OrderController;
+use App\Http\Controllers\Admin\PosDeviceController;
+use App\Http\Controllers\Admin\PosSaleController;
+use App\Http\Controllers\Admin\PosShortageController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\ProductVariantController;
@@ -119,6 +122,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function ():
     Route::delete('images/{image}', [ProductImageController::class, 'destroy'])->middleware('permission:products.update|catalog.manage|admin.access')->name('images.destroy');
     Route::patch('images/{image}/primary', [ProductImageController::class, 'makePrimary'])->middleware('permission:products.update|catalog.manage|admin.access')->name('images.primary');
     Route::patch('images/{image}/move', [ProductImageController::class, 'move'])->middleware('permission:products.update|catalog.manage|admin.access')->name('images.move');
+    Route::prefix('pos')->name('pos.')->middleware('permission:pos.manage|admin.access')->group(function (): void {
+        Route::get('sales', [PosSaleController::class, 'index'])->name('sales.index');
+        Route::get('sales/{sale}', [PosSaleController::class, 'show'])->name('sales.show');
+        Route::patch('sales/{sale}/void', [PosSaleController::class, 'void'])->name('sales.void');
+        Route::get('shortages', [PosShortageController::class, 'index'])->name('shortages.index');
+        Route::patch('shortages/{shortage}', [PosShortageController::class, 'update'])->name('shortages.update');
+        Route::get('device', [PosDeviceController::class, 'index'])->name('device.index');
+        Route::post('device', [PosDeviceController::class, 'store'])->name('device.store');
+        Route::delete('device/{device}', [PosDeviceController::class, 'destroy'])->name('device.destroy');
+    });
     Route::get('stock', [InventoryController::class, 'index'])->middleware('permission:inventory.view|admin.access')->name('stock.index');
     Route::get('stock/adjustments', [StockAdjustmentController::class, 'index'])->middleware('permission:inventory.adjust|admin.access')->name('stock.adjustments.index');
     Route::post('stock/adjustments', [StockAdjustmentController::class, 'store'])->middleware('permission:inventory.adjust|admin.access')->name('stock.adjustments.store');

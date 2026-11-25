@@ -30,6 +30,6 @@ class SeoController extends Controller
 
     public function robots(): Response
     {
-        return response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /checkout\nDisallow: /cart\nSitemap: ".route('seo.sitemap')."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+        return response("User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /pos\nDisallow: /checkout\nDisallow: /cart\nSitemap: ".route('seo.sitemap')."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }
 }

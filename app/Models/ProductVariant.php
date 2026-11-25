@@ -32,10 +32,16 @@ class ProductVariant extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function posSaleItems(): HasMany
+    {
+        return $this->hasMany(PosSaleItem::class);
+    }
+
     /** Orders or stock activity beyond the opening balance must survive catalog clean-up. */
     public function hasHistory(): bool
     {
         return $this->orderItems()->exists()
+            || $this->posSaleItems()->exists()
             || $this->stockMovements()->where('type', '!=', StockMovementType::Opening->value)->exists();
     }
 

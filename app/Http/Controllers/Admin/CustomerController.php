@@ -15,7 +15,7 @@ class CustomerController extends Controller
 
     public function show(User $customer): View
     {
-        abort_if($customer->hasAnyRole(['administrator', 'catalog-manager']), 404);
+        abort_if($customer->roles()->exists(), 404);
 
         return view('admin.customers.show', ['customer' => $customer->load(['orders.items'])]);
     }
