@@ -145,8 +145,8 @@ class PhaseFourReleaseTest extends TestCase
         $csv = $this->actingAs($this->reportAdministrator())->get(route('admin.reports.export', ['report' => 'sales']))->streamedContent();
         $rows = array_map(fn (string $line) => str_getcsv($line, escape: ''), explode("\n", trim($csv)));
 
-        $this->assertSame("'=HYPERLINK(\"http://evil.test\")", $rows[1][2]);
-        $this->assertSame('0.000', $rows[1][4]);
+        $this->assertSame("'=HYPERLINK(\"http://evil.test\")", $rows[1][3]);
+        $this->assertSame('0.000', $rows[1][6]);
     }
 
     public function test_the_store_uses_libyan_time_and_arabic_validation_messages(): void
