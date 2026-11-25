@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\BarcodeController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -108,6 +109,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function ():
         Route::delete('concerns/{concern}', [TaxonomyController::class, 'destroyConcern'])->name('concerns.destroy');
         Route::delete('skin-types/{skinType}', [TaxonomyController::class, 'destroySkinType'])->name('skin-types.destroy');
         Route::delete('ingredients/{ingredient}', [TaxonomyController::class, 'destroyIngredient'])->name('ingredients.destroy');
+    });
+    Route::middleware('permission:products.update|catalog.manage|admin.access')->group(function (): void {
+        Route::get('barcodes', [BarcodeController::class, 'index'])->name('barcodes.index');
+        Route::patch('barcodes/{variant}', [BarcodeController::class, 'update'])->name('barcodes.update');
     });
     Route::get('products', [ProductController::class, 'index'])->middleware('permission:products.view|catalog.manage|admin.access')->name('products.index');
     Route::get('products/create', [ProductController::class, 'create'])->middleware('permission:products.create|catalog.manage|admin.access')->name('products.create');
