@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Delivery;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -24,5 +25,23 @@ class LocationSearchEndpointTest extends TestCase
         $this->getJson(route('locations.reverse', ['latitude' => '91', 'longitude' => '13.1913000']))
             ->assertUnprocessable()
             ->assertJsonValidationErrors('latitude');
+    }
+
+    public function test_it_returns_a_friendly_error_when_the_geocoder_is_unreachable(): void
+    {
+        Http::fake(fn () => throw new ConnectionException('timeout'));
+
+        $this->getJson(route('locations.search', ['q' => 'طرابلس']))
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'تعذر البحث عن الموقع حاليًا. اختاريه مباشرة من الخريطة.');
+    }
+
+    public function test_it_returns_a_friendly_error_when_the_reverse_lookup_is_unreachable(): void
+    {
+        Http::fake(fn () => throw new ConnectionException('timeout'));
+
+        $this->getJson(route('locations.reverse', ['latitude' => '32.8872000', 'longitude' => '13.1913000']))
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'تعذر جلب اسم العنوان حاليًا. يمكنك حفظ الإحداثيات كما هي.');
     }
 }

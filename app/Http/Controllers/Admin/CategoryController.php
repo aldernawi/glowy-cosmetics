@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Services\ProductImageService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
@@ -22,7 +23,7 @@ class CategoryController extends Controller
 
     public function store(StoreCategoryRequest $request, ProductImageService $images): RedirectResponse
     {
-        $attributes = $request->validated() + ['is_active' => $request->boolean('is_active'), 'is_featured' => $request->boolean('is_featured')];
+        $attributes = Arr::except($request->validated(), ['image']) + ['is_active' => $request->boolean('is_active'), 'is_featured' => $request->boolean('is_featured')];
         if ($request->hasFile('image')) {
             $attributes['image_path'] = $images->storeOriginal($request->file('image'), 'categories');
         }
@@ -33,13 +34,14 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category, ProductImageService $images): RedirectResponse
     {
-        $attributes = $request->validated() + ['is_active' => $request->boolean('is_active'), 'is_featured' => $request->boolean('is_featured')];
+        $attributes = Arr::except($request->validated(), ['image']) + ['is_active' => $request->boolean('is_active'), 'is_featured' => $request->boolean('is_featured')];
         if ($request->hasFile('image')) {
             $attributes['image_path'] = $images->storeOriginal($request->file('image'), 'categories');
         }
+        $previousImage = $category->image_path;
         $category->update($attributes);
-        if (isset($attributes['image_path']) && $category->getOriginal('image_path') && ! Category::query()->whereKeyNot($category->id)->where('image_path', $category->getOriginal('image_path'))->exists()) {
-            Storage::disk('public')->delete($category->getOriginal('image_path'));
+        if (isset($attributes['image_path']) && $previousImage && ! Category::query()->where('image_path', $previousImage)->exists()) {
+            Storage::disk('public')->delete($previousImage);
         }
 
         return back()->with('status', 'تم تحديث التصنيف.');

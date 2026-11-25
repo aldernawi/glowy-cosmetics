@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use App\Models\StockMovement;
 use App\Models\User;
 use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -19,13 +20,13 @@ class ReportService
     public function dashboard(array $filters = []): array
     {
         $sales = $this->filteredOrders(Order::query()->where('status', OrderStatus::Delivered->value), $filters);
-        $salesTotal = BigDecimal::of((string) ($sales->sum('total') ?: '0'))->toScale(3);
+        $salesTotal = BigDecimal::of((string) ($sales->sum('total') ?: '0'))->toScale(3, RoundingMode::HalfUp);
         $salesCount = (clone $sales)->count();
 
         return [
             'sales_total' => (string) $salesTotal,
             'sales_count' => $salesCount,
-            'average_order' => $salesCount > 0 ? (string) $salesTotal->dividedBy($salesCount, 3) : '0.000',
+            'average_order' => $salesCount > 0 ? (string) $salesTotal->dividedBy($salesCount, 3, RoundingMode::HalfUp) : '0.000',
             'orders_count' => $this->filteredOrders(Order::query(), $filters)->count(),
             'customers_count' => User::query()->whereHas('orders')->count(),
             'products_count' => Product::query()->count(),

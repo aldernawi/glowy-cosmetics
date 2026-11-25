@@ -38,9 +38,10 @@ class BrandController extends Controller
         if ($request->hasFile('logo')) {
             $attributes['logo_path'] = $images->storeOriginal($request->file('logo'), 'brands');
         }
+        $previousLogo = $brand->logo_path;
         $brand->update($attributes);
-        if (isset($attributes['logo_path']) && $brand->getOriginal('logo_path') && ! Brand::query()->whereKeyNot($brand->id)->where('logo_path', $brand->getOriginal('logo_path'))->exists()) {
-            Storage::disk('public')->delete($brand->getOriginal('logo_path'));
+        if (isset($attributes['logo_path']) && $previousLogo && ! Brand::query()->where('logo_path', $previousLogo)->exists()) {
+            Storage::disk('public')->delete($previousLogo);
         }
 
         return to_route('admin.brands.index')->with('status', 'تم تحديث الماركة.');

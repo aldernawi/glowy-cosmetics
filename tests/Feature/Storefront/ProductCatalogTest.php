@@ -77,4 +77,16 @@ class ProductCatalogTest extends TestCase
             ->assertSee('product_variant_id" value="'.$singleVariant->id.'"', false)
             ->assertSee('اختاري الحجم');
     }
+
+    public function test_product_structured_data_cannot_break_out_of_its_script_tag(): void
+    {
+        $product = Product::query()->create(['name_ar' => 'سيروم', 'slug' => 'structured-data', 'description' => '</script><script>alert(1)</script> نقاء & وهج']);
+        $product->createDefaultVariant('STRUCTURED-1', '10.000');
+
+        $html = $this->get(route('products.show', $product))->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('<script>alert(1)</script>', $html);
+        $this->assertSame(1, preg_match('#<script type="application/ld\+json">(.*?)</script>#s', $html, $matches));
+        $this->assertSame($product->description, json_decode($matches[1], true)['description']);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Storefront;
 
+use App\Exceptions\OutOfDeliveryRangeException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storefront\DeliveryQuoteRequest;
 use App\Http\Requests\Storefront\StoreCheckoutRequest;
@@ -18,6 +19,8 @@ use RuntimeException;
 
 class CheckoutController extends Controller
 {
+    private const OUT_OF_RANGE_MESSAGE = 'موقعك خارج نطاق التوصيل الحالي. نأسف لذلك، ويسعدنا تواصلك معنا لنساعدك.';
+
     public function __invoke(Request $request, CartService $carts): View
     {
         $cart = $carts->resolve($request)->load('items.productVariant.product');
@@ -34,7 +37,9 @@ class CheckoutController extends Controller
         try {
             $quote = $delivery->quote($request->string('latitude')->toString(), $request->string('longitude')->toString());
             $order = $checkout->create($carts->resolve($request), $request->user(), $quote, ['customer_name' => $request->string('customer_name')->toString(), 'phone' => $request->string('phone')->toString(), 'secondary_phone' => $request->string('secondary_phone')->toString(), 'city_region' => $request->string('city_region')->toString(), 'address' => $request->string('address')->toString(), 'landmark' => $request->string('landmark')->toString(), 'place_id' => $request->string('place_id')->toString(), 'notes' => $request->string('notes')->toString(), 'latitude' => $request->string('latitude')->toString(), 'longitude' => $request->string('longitude')->toString()]);
-        } catch (DomainException|RuntimeException $e) {
+        } catch (OutOfDeliveryRangeException) {
+            return back()->withErrors(['checkout' => self::OUT_OF_RANGE_MESSAGE]);
+        } catch (DomainException|RuntimeException) {
             return back()->withErrors(['checkout' => 'تعذر تأكيد الطلب. يرجى تحديث موقع التوصيل أو السلة ثم المحاولة.']);
         }
 
@@ -47,6 +52,8 @@ class CheckoutController extends Controller
     {
         try {
             $quote = $delivery->quote($request->string('latitude')->toString(), $request->string('longitude')->toString());
+        } catch (OutOfDeliveryRangeException) {
+            return response()->json(['message' => self::OUT_OF_RANGE_MESSAGE], 422);
         } catch (DomainException|RuntimeException) {
             return response()->json(['message' => 'تعذر حساب رسوم التوصيل لهذا الموقع.'], 422);
         }

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Delivery;
 
+use App\Exceptions\OutOfDeliveryRangeException;
 use App\Models\DeliveryTier;
 use App\Services\DeliveryTierService;
 use DomainException;
@@ -33,11 +34,15 @@ class DeliveryTierServiceTest extends TestCase
         app(DeliveryTierService::class)->validateActiveTiers();
     }
 
-    public function test_out_of_range_distance_uses_the_highest_active_tier(): void
+    public function test_a_distance_beyond_the_highest_active_tier_is_rejected(): void
     {
         DeliveryTier::query()->create(['min_distance_km' => '0.000', 'max_distance_km' => '10.000', 'fee' => '10.000', 'is_active' => true]);
-        $nearest = DeliveryTier::query()->create(['min_distance_km' => '10.000', 'max_distance_km' => '20.000', 'fee' => '15.000', 'is_active' => true]);
+        $highest = DeliveryTier::query()->create(['min_distance_km' => '10.000', 'max_distance_km' => '20.000', 'fee' => '15.000', 'is_active' => true]);
 
-        $this->assertSame($nearest->id, app(DeliveryTierService::class)->tierForDistance('34.500')->id);
+        $tiers = app(DeliveryTierService::class);
+        $this->assertSame($highest->id, $tiers->tierForDistance('20.000')->id);
+
+        $this->expectException(OutOfDeliveryRangeException::class);
+        $tiers->tierForDistance('20.001');
     }
 }

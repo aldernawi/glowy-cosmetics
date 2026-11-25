@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Data\RouteResult;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -20,12 +21,17 @@ class OpenRouteService
         $endpoint = '/v2/directions/driving-car';
         $url = str_ends_with($baseUrl, $endpoint) ? $baseUrl : "{$baseUrl}{$endpoint}";
 
-        $response = Http::acceptJson()->withToken($key)->post($url, [
-            'coordinates' => [
-                [(float) $originLongitude, (float) $originLatitude],
-                [(float) $destinationLongitude, (float) $destinationLatitude],
-            ],
-        ]);
+        try {
+            $response = Http::acceptJson()->connectTimeout(5)->timeout(15)->withToken($key)->post($url, [
+                'coordinates' => [
+                    [(float) $originLongitude, (float) $originLatitude],
+                    [(float) $destinationLongitude, (float) $destinationLatitude],
+                ],
+            ]);
+        } catch (ConnectionException $exception) {
+            throw new RuntimeException('OpenRouteService is unreachable.', previous: $exception);
+        }
+
         $summary = $response->json('routes.0.summary');
 
         if (! $response->successful() || ! is_array($summary) || ! isset($summary['distance'], $summary['duration'])) {

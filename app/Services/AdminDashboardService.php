@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\ProductVariant;
 use Brick\Math\BigDecimal;
+use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -22,13 +23,13 @@ class AdminDashboardService
         $lastSevenDays = collect(range(6, 0))->map(function (int $daysAgo) use ($delivered): array {
             $date = CarbonImmutable::today()->subDays($daysAgo);
 
-            return ['label' => $date->format('d/m'), 'sales' => (string) BigDecimal::of((string) ((clone $delivered)->whereDate('created_at', $date)->sum('total') ?: 0))->toScale(3)];
+            return ['label' => $date->format('d/m'), 'sales' => (string) BigDecimal::of((string) ((clone $delivered)->whereDate('created_at', $date)->sum('total') ?: 0))->toScale(3, RoundingMode::HalfUp)];
         });
 
         return [
-            'sales_today' => BigDecimal::of((string) $salesToday)->toScale(3)->__toString(),
-            'sales_month' => BigDecimal::of((string) $salesMonth)->toScale(3)->__toString(),
-            'average_order_value' => $deliveredCount > 0 ? BigDecimal::of((string) ((clone $delivered)->sum('total') ?: 0))->dividedBy($deliveredCount, 3)->__toString() : '0.000',
+            'sales_today' => BigDecimal::of((string) $salesToday)->toScale(3, RoundingMode::HalfUp)->__toString(),
+            'sales_month' => BigDecimal::of((string) $salesMonth)->toScale(3, RoundingMode::HalfUp)->__toString(),
+            'average_order_value' => $deliveredCount > 0 ? BigDecimal::of((string) ((clone $delivered)->sum('total') ?: 0))->dividedBy($deliveredCount, 3, RoundingMode::HalfUp)->__toString() : '0.000',
             'orders_today' => Order::query()->whereDate('created_at', $today)->count(),
             'active_orders' => Order::query()->whereNotIn('status', ['delivered', 'cancelled', 'returned'])->count(),
             'customers_count' => Order::query()->whereNotNull('user_id')->distinct('user_id')->count('user_id'),

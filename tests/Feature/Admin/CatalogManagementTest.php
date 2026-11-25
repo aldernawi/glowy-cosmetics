@@ -88,4 +88,38 @@ class CatalogManagementTest extends TestCase
             @unlink($temporaryPath);
         }
     }
+
+    public function test_replacing_a_brand_logo_keeps_the_new_file_and_removes_the_old_one(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('brands/old.png', 'old');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+        $brand = Brand::query()->create(['name_ar' => 'ماركة', 'slug' => 'logo-brand', 'logo_path' => 'brands/old.png']);
+
+        $this->actingAs($administrator)->patch(route('admin.brands.update', $brand), [
+            'name_ar' => 'ماركة', 'slug' => 'logo-brand', 'is_active' => 1, 'logo' => UploadedFile::fake()->image('new.png'),
+        ])->assertRedirect(route('admin.brands.index'));
+
+        Storage::disk('public')->assertExists($brand->refresh()->logo_path);
+        Storage::disk('public')->assertMissing('brands/old.png');
+    }
+
+    public function test_replacing_a_brand_logo_keeps_a_file_shared_with_another_brand(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('brands/shared.png', 'shared');
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+        $brand = Brand::query()->create(['name_ar' => 'أولى', 'slug' => 'first-shared', 'logo_path' => 'brands/shared.png']);
+        Brand::query()->create(['name_ar' => 'ثانية', 'slug' => 'second-shared', 'logo_path' => 'brands/shared.png']);
+
+        $this->actingAs($administrator)->patch(route('admin.brands.update', $brand), [
+            'name_ar' => 'أولى', 'slug' => 'first-shared', 'is_active' => 1, 'logo' => UploadedFile::fake()->image('new.png'),
+        ])->assertRedirect();
+
+        Storage::disk('public')->assertExists('brands/shared.png');
+    }
 }

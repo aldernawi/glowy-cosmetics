@@ -77,7 +77,7 @@
                 <li><strong class="text-white">١.</strong> تبدأ أول شريحة نشطة من 0 كم.</li>
                 <li><strong class="text-white">٢.</strong> كل شريحة نشطة تليها تبدأ من نهاية التي قبلها بالضبط.</li>
                 <li><strong class="text-white">٣.</strong> الحد الأعلى مشمول؛ لذلك 10 كم تدخل في شريحة 0–10.</li>
-                <li><strong class="text-white">٤.</strong> إذا تجاوزت المسافة آخر حد نشط، يُستخدم سعر آخر شريحة نشطة.</li>
+                <li><strong class="text-white">٤.</strong> إذا تجاوزت المسافة آخر حد نشط، يُرفض الطلب لأنه خارج نطاق التوصيل.</li>
             </ol>
         </aside>
     </section>

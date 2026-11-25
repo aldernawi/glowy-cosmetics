@@ -53,4 +53,18 @@ class OrderStatusTest extends TestCase
         $this->expectException(DomainException::class);
         app(OrderService::class)->transition($order, OrderStatus::Delivered);
     }
+
+    public function test_the_order_page_shows_who_changed_the_status(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create(['name' => 'مسؤولة الطلبات']);
+        $administrator->givePermissionTo('admin.access');
+        $order = Order::query()->create(['number' => 'GLW-HISTORY', 'status' => OrderStatus::Pending, 'customer_name' => 'عميلة', 'phone' => '09', 'delivery_latitude' => '1.0000000', 'delivery_longitude' => '1.0000000', 'delivery_distance_km' => '1.000', 'delivery_fee' => '1.000', 'store_latitude_snapshot' => '1.0000000', 'store_longitude_snapshot' => '1.0000000', 'subtotal' => '1.000', 'discount' => '0.000', 'total' => '2.000']);
+        app(OrderService::class)->transition($order, OrderStatus::Confirmed, $administrator);
+
+        $this->actingAs($administrator)->get(route('admin.orders.show', $order))
+            ->assertOk()
+            ->assertSee('قيد الانتظار ← تم التأكيد')
+            ->assertSee('مسؤولة الطلبات ·');
+    }
 }

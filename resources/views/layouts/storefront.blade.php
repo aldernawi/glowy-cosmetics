@@ -21,7 +21,7 @@
         <meta property="og:url" content="{{ $pageCanonical }}">
         @if(!empty($ogImage))<meta property="og:image" content="{{ $ogImage }}">@endif
         <meta name="twitter:card" content="summary_large_image">
-        @if(!empty($structuredData))<script type="application/ld+json">{!! json_encode(array_filter($structuredData, fn ($value) => $value !== null), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>@endif
+        @if(!empty($structuredData))<script type="application/ld+json">{!! json_encode(array_filter($structuredData, fn ($value) => $value !== null), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>@endif
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">

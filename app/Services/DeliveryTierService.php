@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\OutOfDeliveryRangeException;
 use App\Models\DeliveryTier;
 use Brick\Math\BigDecimal;
 use DomainException;
@@ -50,17 +51,11 @@ class DeliveryTierService
 
         $tier = $this->activeTiers()->first(fn (DeliveryTier $tier): bool => $distance->isLessThanOrEqualTo(BigDecimal::of($tier->max_distance_km)));
 
-        if ($tier !== null) {
-            return $tier;
+        if ($tier === null) {
+            throw new OutOfDeliveryRangeException;
         }
 
-        $nearestTier = $this->activeTiers()->last();
-
-        if ($nearestTier === null) {
-            throw new DomainException('No active delivery tiers are configured.');
-        }
-
-        return $nearestTier;
+        return $tier;
     }
 
     /** @return Collection<int, DeliveryTier> */

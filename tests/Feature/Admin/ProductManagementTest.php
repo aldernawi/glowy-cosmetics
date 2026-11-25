@@ -82,4 +82,19 @@ class ProductManagementTest extends TestCase
         $this->assertSame([$ingredient->id], $product->fresh()->ingredients()->pluck('id')->all());
         $this->assertDatabaseHas('product_variants', ['product_id' => $product->id, 'is_default' => true, 'name' => '30 مل', 'size' => '30ml', 'compare_at_price' => '120.000']);
     }
+
+    public function test_the_edit_form_shows_the_default_variant_instead_of_the_cheapest_one(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $administrator = User::factory()->create();
+        $administrator->givePermissionTo('admin.access');
+        $product = Product::query()->create(['name_ar' => 'كريم', 'slug' => 'two-sizes']);
+        $product->createDefaultVariant('TWO-100', '50.000')->update(['size' => '100ml', 'compare_at_price' => '60.000']);
+        $product->variants()->create(['sku' => 'TWO-30', 'size' => '30ml', 'price' => '20.000', 'compare_at_price' => '25.000', 'is_active' => true]);
+
+        $html = $this->actingAs($administrator)->get(route('admin.products.edit', $product))->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression('/<input name="default_variant_size"[^>]*value="100ml"/', $html);
+        $this->assertMatchesRegularExpression('/<input name="compare_at_price"[^>]*value="60\.000"/', $html);
+    }
 }
